@@ -53,7 +53,7 @@ public class Autenticador {
                 data = line.split(",");
                 String pwdCSV = data[4];
                 int tipoUsuario = Integer.parseInt(data[3]); //1 es Comprador, 2 es Organizador
-                Usuario nuevoUser = new Usuario(data[1], data[2], Integer.parseInt(data[0]));
+                Usuario nuevoUser = new Usuario(data[1], data[2], data[0]);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -67,7 +67,7 @@ public class Autenticador {
         // return 3; // si es invalido
     };
 
-    public static int registroExitoso(String nombre, String apellido, int id, int tipoUsuario, String contrasenia){
+    public static int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
         // return 1 registro existoso
         // return 2 ya existe el usuario
         // return 3 caracteres invalidos.
@@ -76,8 +76,7 @@ public class Autenticador {
         if(nombre.contains(",") || apellido.contains(",")){ return 3; } //si el nombre o el apellido tiene coma retorna
                                                                         //ya que romperia el sofisticado sistema csv
         if(tipoUsuario == 2){
-            String verifId = Integer.toString(id);
-            if(verifId.length() != 11){return 5;}
+            if(id.length() != 11){return 5;}
             Organizador nuevoOrg = new Organizador(nombre, apellido, id);
             // aca se podria mejorar pero no se si el containsKey usa el equals que le redefini o no.. asi es mas lento pero anda seguro
             for(Map.Entry<Organizador, String> entry : organizadoresLogin.entrySet()){
@@ -89,8 +88,7 @@ public class Autenticador {
             organizadoresLogin.put(nuevoOrg, contrasenia);
             return 1;
         }else if(tipoUsuario == 1){
-            String verifId = Integer.toString(id);
-            if(verifId.length() != 8){return 5;}
+            if(id.length() != 8){return 5;}
             Comprador nuevoComprador = new Comprador(nombre, apellido, id);
             for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
                 Comprador c = entry.getKey();

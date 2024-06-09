@@ -1,19 +1,19 @@
 public class Usuario {
     private String nombre;
     private String apellido;
-    private int id; //en caso del Comprador va a ser DNI, en Org va a ser CUIT/CUIL
+    private String id; //en caso del Comprador va a ser DNI, en Org va a ser CUIT/CUIL
 
-    Usuario(String nombre, String apellido, int id) {
+    Usuario(String nombre, String apellido, String id) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.id = id;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
