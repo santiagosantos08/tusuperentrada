@@ -32,4 +32,11 @@ public class Usuario {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+    @Override
+    public boolean equals(Object o){
+        if (o == this) {return true;}
+        if (!(o instanceof Usuario)) {return false;}
+        Usuario u = (Usuario) o;
+        return ((this.getApellido().equals(u.getApellido()))&&(this.getNombre().equals(u.getNombre()))&&(this.getId() == u.getId()));
+    }
 }
