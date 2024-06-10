@@ -12,6 +12,8 @@ public class Autenticador {
     // ya que la mayoria del codigo se podia compartir con el comprador. Dsp una vez que se registre se pediran las otras preferencias.
     // desde afuera ya sabemos que tipo de usuario es x la long del Id, se puede ammpliar esto sin modificar
 
+    //creo que tambien va a hacer falta agregar algun metodo para recuperar los datos de algun Id dado, ya que desde afuera la registrar si los tenemos pero al iniciar sesion no.
+
     private static HashMap<Comprador, String> compradoresLogin = new HashMap<>(); //mapa de cada usuario a su contraseña(super seguro!)
     private static HashMap<Organizador, String> organizadoresLogin = new HashMap<>();
 
