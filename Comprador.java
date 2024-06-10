@@ -31,7 +31,7 @@ public class Comprador extends Usuario{
     }
     public boolean reservarEvento(Evento e, int nro_asiento) {
         if(e.asientoDisponible(nro_asiento)) {
-            e.seleccionarAsiento(nro_asiento); //Hacer la implementacion de este metodo en evento
+            e.seleccionarAsiento(nro_asiento);
             this.eventos.add(e);
             return true;
         }
