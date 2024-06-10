@@ -17,13 +17,19 @@ import java.util.Map;
 
 public class Autenticador {
     // Estructura del CSV:
-    // ID[DNI o CUIT/CUIL], nombre, apellido, tipoUsuario[1= Comprador, 2= Organizador], contraseña
+    // ID[DNI o CUIT/CUIL], nombre, apellido, tipoUsuario[1= Comprador, 2= Organizador], contraseña, si es Comprador tiene email, fecha nacimiento
+    //en otro archivo se guarda ID_comprador y preferencia
+    // 1 entry por preferencia
+    //en otro ID_comprador y evento
+    //1 entry por evento
+    //misma logica para el organizador
 
     private static HashMap<Comprador, String> compradoresLogin = new HashMap<>(); //mapa de cada usuario a su contraseña(super seguro!)
     private static HashMap<Organizador, String> organizadoresLogin = new HashMap<>();
 
     public static boolean guardarDatos(){
-        try (FileWriter writer = new FileWriter("user_data.csv",false)){
+        String userCredentials = "user_data.csv";
+        try (FileWriter writer = new FileWriter(userCredentials,false)){
             for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
                 Comprador comprador;
                 comprador = entry.getKey();
@@ -51,6 +57,9 @@ public class Autenticador {
 
     public static boolean levantarDatos(){
         String csvFile = "user_data.csv";
+        String preferenciasComprador = "prefs_comprador.csv";
+        String eventosComprador = "evs_comprador.csv";
+
         String line;
         String[] data;
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))){
@@ -82,10 +91,29 @@ public class Autenticador {
                 c.setEmail(email);
                 c.setNacimiento(fechaNacimiento);
                 c.setPreferencias(preferencias);
+                return true;
             }
         }
+        return false; //si el id no existe
     };
-    public static Comprador get
+    public static Comprador getCompradorById(String id){
+        for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
+            Comprador c = entry.getKey();
+            if (c.getId().equals(id)){
+                return c;
+            }
+        }
+        return null;
+    }
+    public static Organizador getOrganizadorById(String id){
+        for(Map.Entry<Organizador, String> entry : organizadoresLogin.entrySet()){
+            Organizador o = entry.getKey();
+            if(o.getId().equals(id)){
+                return o;
+            }
+        }
+        return null;
+    }
     public static int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
         // return 1 registro existoso
         // return 2 ya existe el usuario
