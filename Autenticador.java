@@ -8,6 +8,9 @@ import java.util.Map;
 public class Autenticador {
     // Estructura del CSV:
     // ID[DNI o CUIT/CUIL], nombre, apellido, tipoUsuario[1= Comprador, 2= Organizador], contraseña
+    // En el organizador falta pedir datos de AFIP y etc pero no se entrega este sprinmt, lo deje ahi como para adelantar
+    // ya que la mayoria del codigo se podia compartir con el comprador. Dsp una vez que se registre se pediran las otras preferencias.
+    // desde afuera ya sabemos que tipo de usuario es x la long del Id, se puede ammpliar esto sin modificar
 
     private static HashMap<Comprador, String> compradoresLogin = new HashMap<>(); //mapa de cada usuario a su contraseña(super seguro!)
     private static HashMap<Organizador, String> organizadoresLogin = new HashMap<>();
@@ -60,10 +63,38 @@ public class Autenticador {
         return false;
     };
 
-    public static int loginValido(){
-        return 1; // si es valido y es usuario
-        // return 2; // si es valido y es comprador
-        // return 3; // si es invalido
+    public static int loginValido(String id, String contrasenia){
+        // return 1; // si es valido y es comprador
+        // return 2; // si es valido y es organizador
+        // return 3; // si es invalido x comb de user/pass
+        // return 4 si es invalido x cantidad de caracteres del ID
+        // return 5 si el usuario no existe
+        if(id.length() != 11 && id.length() != 8){
+            return 4; //el id no es ni dni ni cuit/cuil
+        }else if(id.length() == 11){ //organizador
+            for(Map.Entry<Organizador, String> entry : organizadoresLogin.entrySet()){
+                Organizador c = entry.getKey();
+                if (c.getId().equals(id)) {
+                    if(contrasenia.equals(entry.getKey())){
+                        return 2;
+                    }
+                    return 3;
+                }
+            }
+            return 5;
+        }else if(id.length() == 8){ //comprador
+            for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
+                Comprador c = entry.getKey();
+                if (c.getId().equals(id)){
+                    if(contrasenia.equals(entry.getKey())){
+                        return 1;
+                    }
+                    return 3;
+                }
+            }
+            return 5;
+        }
+        return 3; //en realidad no hace falta pero es para no dejar sin return default, es el mas generico.
     };
 
     public static int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
