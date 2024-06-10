@@ -1,9 +1,19 @@
+import java.util.Date;
 import java.util.HashMap;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+
+//Criterios de Aceptacion:
+//
+//    LISTO: Verificar que pueda ingresar los datos de manera clara y facil.
+//
+//    Corroborar que ingrese la informacion necesaria: nombre, apellido, contraseña, nro documento, fecha de nacimiento, email y tipos de eventos que le interesan.
+//
+//    Permitir que pueda acceder a actualizar sus datos e intereses en distintos tipos de eventos de forma entendible.
 
 public class Autenticador {
     // Estructura del CSV:
@@ -65,7 +75,17 @@ public class Autenticador {
         // return 2; // si es valido y es comprador
         // return 3; // si es invalido
     };
-
+    public static boolean setDatosExtraComprador(String id, String email, Date fechaNacimiento, List<String> preferencias){
+        for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
+            Comprador c = entry.getKey();
+            if (c.getId().equals(id)){
+                c.setEmail(email);
+                c.setNacimiento(fechaNacimiento);
+                c.setPreferencias(preferencias);
+            }
+        }
+    };
+    public static Comprador get
     public static int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
         // return 1 registro existoso
         // return 2 ya existe el usuario
