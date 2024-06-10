@@ -2,12 +2,12 @@ import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
 public class Evento {
-    private int capacidad;
+    private int capacidad, id;
     private ArrayList<Boolean> asientos;
     private String nombre, ubicacion,descripcion, imagen_url, tipo_evento;
     private LocalDate fecha;//Cambiar por una lista
 
-    public Evento(int capacidad, String nombre, String ubicacion, String descripcion, String imagen_url, String tipo_evento, LocalDate fecha) {
+    public Evento(int capacidad, String nombre, String ubicacion, String descripcion, String imagen_url, String tipo_evento, LocalDate fecha, int id) {
         this.capacidad = capacidad;
         this.nombre = nombre;
         this.ubicacion = ubicacion;
@@ -19,6 +19,7 @@ public class Evento {
         for (int i = 0; i < capacidad; i++) {
             asientos.add(true);
         }
+        this.id = id;
     }
 
     public int getCapacidad() {

@@ -30,7 +30,7 @@ public class Comprador extends Usuario{
         this.preferencias = preferencias;
     }
     public boolean reservarEvento(Evento e, int nro_asiento) {
-        if(e.asientoDisponible(nro_asiento)) {
+        if(e.asientoDisponible(nro_asiento)) { //Si el asiento esta disponible se reserva
             e.seleccionarAsiento(nro_asiento);
             this.eventos.add(e);
             return true;
