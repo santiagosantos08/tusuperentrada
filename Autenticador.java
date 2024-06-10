@@ -1,26 +1,18 @@
 import java.util.HashMap;
 import java.io.BufferedReader;
-import java.io.PrintWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
-import static java.util.HashMap.newHashMap;
-
 public class Autenticador {
     // Estructura del CSV:
     // ID[DNI o CUIT/CUIL], nombre, apellido, tipoUsuario[1= Comprador, 2= Organizador], contraseña
 
-    private HashMap<Comprador, String> compradoresLogin; //mapa de cada usuario a su contraseña(super seguro!)
-    private HashMap<Organizador, String> organizadoresLogin;
+    private static HashMap<Comprador, String> compradoresLogin = new HashMap<>(); //mapa de cada usuario a su contraseña(super seguro!)
+    private static HashMap<Organizador, String> organizadoresLogin = new HashMap<>();
 
-    Autenticador(){
-        compradoresLogin = new HashMap<>();
-        organizadoresLogin = new HashMap<>();
-    }
-
-    public boolean guardarDatos(){
+    public static boolean guardarDatos(){
         try (FileWriter writer = new FileWriter("user_data.csv",false)){
             for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
                 Comprador comprador;
@@ -29,8 +21,6 @@ public class Autenticador {
                 userLine.append(comprador.getId()).append(",").append(comprador.getNombre())
                         .append(",").append(comprador.getApellido()).append(",").append("1")
                         .append(",").append(entry.getValue()).append("\n");
-                System.out.println("guardado comprador");
-                System.out.println(userLine);
                 String entradaCSV = userLine.toString();
                 writer.write(entradaCSV);
             }
@@ -49,7 +39,7 @@ public class Autenticador {
         return false;
     };
 
-    public boolean levantarDatos(){
+    public static boolean levantarDatos(){
         String csvFile = "user_data.csv";
         String line;
         String[] data;
@@ -70,13 +60,13 @@ public class Autenticador {
         return false;
     };
 
-    public int loginValido(){
+    public static int loginValido(){
         return 1; // si es valido y es usuario
         // return 2; // si es valido y es comprador
         // return 3; // si es invalido
     };
 
-    public int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
+    public static int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
         // return 1 registro existoso
         // return 2 ya existe el usuario
         // return 3 caracteres invalidos.
