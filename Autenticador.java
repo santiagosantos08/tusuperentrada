@@ -75,7 +75,7 @@ public class Autenticador {
             for(Map.Entry<Organizador, String> entry : organizadoresLogin.entrySet()){
                 Organizador c = entry.getKey();
                 if (c.getId().equals(id)) {
-                    if(contrasenia.equals(entry.getKey())){
+                    if(contrasenia.equals(entry.getValue())){
                         return 2;
                     }
                     return 3;
@@ -86,7 +86,7 @@ public class Autenticador {
             for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
                 Comprador c = entry.getKey();
                 if (c.getId().equals(id)){
-                    if(contrasenia.equals(entry.getKey())){
+                    if(contrasenia.equals(entry.getValue())){
                         return 1;
                     }
                     return 3;
