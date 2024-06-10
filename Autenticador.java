@@ -6,27 +6,33 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+import static java.util.HashMap.newHashMap;
+
 public class Autenticador {
     // Estructura del CSV:
     // ID[DNI o CUIT/CUIL], nombre, apellido, tipoUsuario[1= Comprador, 2= Organizador], contraseña
 
-    private static HashMap<Comprador, String> compradoresLogin; //mapa de cada usuario a su contraseña(super seguro!)
-    private static HashMap<Organizador, String> organizadoresLogin;
+    private HashMap<Comprador, String> compradoresLogin; //mapa de cada usuario a su contraseña(super seguro!)
+    private HashMap<Organizador, String> organizadoresLogin;
 
-    public static boolean guardarDatos(){
-        String csvFile = "user_data.csv";
-        try {
-            FileWriter writer = new FileWriter(csvFile, false); // Append mode false = borra el archivo, true = sigue sobre el final
-            PrintWriter printWriter = new PrintWriter(writer);
+    Autenticador(){
+        compradoresLogin = new HashMap<>();
+        organizadoresLogin = new HashMap<>();
+    }
 
+    public boolean guardarDatos(){
+        try (FileWriter writer = new FileWriter("user_data.csv",false)){
             for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
                 Comprador comprador;
                 comprador = entry.getKey();
                 StringBuilder userLine = new StringBuilder();
                 userLine.append(comprador.getId()).append(",").append(comprador.getNombre())
                         .append(",").append(comprador.getApellido()).append(",").append("1")
-                        .append(",").append(entry.getValue());
-                printWriter.println(userLine.toString());
+                        .append(",").append(entry.getValue()).append("\n");
+                System.out.println("guardado comprador");
+                System.out.println(userLine);
+                String entradaCSV = userLine.toString();
+                writer.write(entradaCSV);
             }
             for(Map.Entry<Organizador, String> entry : organizadoresLogin.entrySet()){
                 Organizador organizador;
@@ -34,8 +40,8 @@ public class Autenticador {
                 StringBuilder userLine = new StringBuilder();
                 userLine.append(organizador.getId()).append(",").append(organizador.getNombre())
                         .append(",").append(organizador.getApellido()).append(",").append("2")
-                        .append(",").append(entry.getValue());
-                printWriter.println(userLine.toString());
+                        .append(",").append(entry.getValue()).append("\n");
+                writer.append(userLine);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -43,17 +49,20 @@ public class Autenticador {
         return false;
     };
 
-    public static boolean levantarDatos(){
+    public boolean levantarDatos(){
         String csvFile = "user_data.csv";
         String line;
         String[] data;
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(csvFile));
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))){
             while ((line = br.readLine()) != null) {
                 data = line.split(",");
-                String pwdCSV = data[4];
                 int tipoUsuario = Integer.parseInt(data[3]); //1 es Comprador, 2 es Organizador
-                Usuario nuevoUser = new Usuario(data[1], data[2], data[0]);
+                if(tipoUsuario == 2){
+                    organizadoresLogin.put(new Organizador(data[1],data[2],data[0]),data[4]);
+                }
+                if(tipoUsuario == 1){
+                    compradoresLogin.put(new Comprador(data[1],data[2],data[0]),data[4]);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -61,13 +70,13 @@ public class Autenticador {
         return false;
     };
 
-    public static int loginValido(){
+    public int loginValido(){
         return 1; // si es valido y es usuario
         // return 2; // si es valido y es comprador
         // return 3; // si es invalido
     };
 
-    public static int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
+    public int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
         // return 1 registro existoso
         // return 2 ya existe el usuario
         // return 3 caracteres invalidos.

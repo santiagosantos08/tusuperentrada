@@ -37,6 +37,6 @@ public class Usuario {
         if (o == this) {return true;}
         if (!(o instanceof Usuario)) {return false;}
         Usuario u = (Usuario) o;
-        return ((this.getApellido().equals(u.getApellido()))&&(this.getNombre().equals(u.getNombre()))&&(this.getId() == u.getId()));
+        return ((this.getApellido().equals(u.getApellido()))&&(this.getNombre().equals(u.getNombre()))&&(this.getId().equals(u.getId())));
     }
 }
