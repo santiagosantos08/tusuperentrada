@@ -1,5 +1,5 @@
 import java.util.Scanner;
-
+// demo de app
 public class main {
     public static void pantallaCompradorInicioSesion(){ // aca en una verison mas completa iria el nombre etc para que lo muestre
         System.out.println(" Pantalla de ejemplo comprador que ya inició sesión \n");
