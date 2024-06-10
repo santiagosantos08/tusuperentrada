@@ -2,6 +2,7 @@ import java.util.Date;
 import java.util.List;
 
 public class Comprador extends Usuario{
+    //..
     private String email;
     private Date nacimiento;
     private List<String> preferencias;
