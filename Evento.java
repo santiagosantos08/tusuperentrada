@@ -50,6 +50,10 @@ public class Evento {
         return fecha;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public boolean asientoDisponible(int nro_asiento) {
         if (nro_asiento <= 0 || nro_asiento > capacidad)
             return false;
