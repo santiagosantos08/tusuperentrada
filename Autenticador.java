@@ -115,8 +115,10 @@ public class Autenticador {
                 c.setEmail(email);
                 c.setNacimiento(fechaNacimiento);
                 c.setPreferencias(preferencias);
+                return true;
             }
         }
+        return false;
     };
     // public static Comprador get //lo comente para poder pushear el intellij no te deja si tiene errores
     public static int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
