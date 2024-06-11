@@ -7,7 +7,7 @@ public class CatalogoEventos {
         this.eventos = new ArrayList<>();
     }
 
-    public agregarEvento(Evento evento){
+    public void agregarEvento(Evento evento){
         eventos.add(evento);
     }
 
