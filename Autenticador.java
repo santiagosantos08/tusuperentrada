@@ -118,7 +118,7 @@ public class Autenticador {
             }
         }
     };
-    public static Comprador get
+    // public static Comprador get //lo comente para poder pushear el intellij no te deja si tiene errores
     public static int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
         // return 1 registro existoso
         // return 2 ya existe el usuario
