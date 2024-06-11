@@ -1,7 +1,7 @@
 public class Usuario {
-    private String nombre;
-    private String apellido;
-    private String id; //en caso del Comprador va a ser DNI, en Org va a ser CUIT/CUIL
+    protected String nombre;
+    protected String apellido;
+    protected String id; //en caso del Comprador va a ser DNI, en Org va a ser CUIT/CUIL
 
     Usuario(String nombre, String apellido, String id) {
         this.nombre = nombre;

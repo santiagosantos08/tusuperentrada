@@ -106,5 +106,16 @@ public class main {
             }
         }
         Autenticador.guardarDatos();
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Ingrese su nombre:");
+        String nombre = scanner.nextLine();
+        System.out.println("Ingrese su apellido:");
+        String apellido = scanner.nextLine();
+        System.out.println("Ingrese su DNI:");
+        String dni = scanner.nextLine();
+
+        Comprador comprador = new Comprador(nombre, apellido, dni);
+        comprador.elegirTipoEnvio();
     }
 }

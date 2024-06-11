@@ -117,8 +117,8 @@ public class Autenticador {
                 c.setPreferencias(preferencias);
             }
         }
-    };
-    public static Comprador get
+    }
+    //public static Comprador get
     public static int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
         // return 1 registro existoso
         // return 2 ya existe el usuario
