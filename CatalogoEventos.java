@@ -49,9 +49,6 @@ public class CatalogoEventos {
                 }
                 for(int i = 0; i < cantCompradores * 2; i = i+2){
                     butacas.put(Integer.parseInt(data[cantValoresFijosCSV + cantFunciones + i + 1]),data[cantValoresFijosCSV + cantFunciones + i]);
-                    //TODO: buscar al usuario con dicho ID y cargarle el evento, por ahora el metodo para buscar usuarios por id es muy malo, cambiar a un  hashShet
-                    //aplica tanto para comprador como vendedor
-                    // IDEA: hacer que cuando se construye un evento que no tiene organizador ni usuarios null ya el const de dicho evento se encargue de agregarle ahi
                 }
                 Evento nuevo = new Evento(capacidad,nombreEvento,ubicacion,descripcion,urlImagen,tipoEvento,fechas,idEvento,idOrganizador,butacas);
                 eventos.put(nuevo.getId(),nuevo);
