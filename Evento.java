@@ -8,6 +8,8 @@ import java.util.Locale;
 public class Evento {
     private int capacidad, id, precio;
     private String nombre, ubicacion,descripcion, imagen_url, tipo_evento; //las fotos tiene que ser muchas!!!!!!!!!!!!! en otra entrega será
+                                                                            //o de ultima para safar que sean links a google fotos y veo que si no esta logueado le
+                                                                            //cambio acá algun argumento al link para que solo muestre algunas NO SE
     private ArrayList<LocalDate> fechas;
     private HashMap<Integer, String> butacasOcupadas; //mapa de nroButaca -> Id comprador que la tiene.
     private String org_id;
