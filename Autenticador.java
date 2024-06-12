@@ -7,13 +7,31 @@ import java.util.Map;
 
 public class Autenticador {
     // Estructura del CSV:
-    // ID[DNI o CUIT/CUIL], nombre, apellido, tipoUsuario[1= Comprador, 2= Organizador], contraseña
-    // En el organizador falta pedir datos de AFIP y etc pero no se entrega este sprinmt, lo deje ahi como para adelantar
-    // ya que la mayoria del codigo se podia compartir con el comprador. Dsp una vez que se registre se pediran las otras preferencias.
-    // desde afuera ya sabemos que tipo de usuario es x la long del Id, se puede ammpliar esto sin modificar
+    // ID[DNI o CUIT/CUIL], nombre, apellido, tipoUsuario[1= Comprador, 2= Organizador], contraseña, cantidadEventos, IDS de los eventos que compró / es dueño depede el rol,
+    // si es comprador tiene cantidadPreferencias, email, nacimiento
+    // , lista de preferencias, ,
+    // en caso de que sea comprador tiene intercalado el el nro de bbutaca que compró, true si la tiene comprada / false si solo reservada,
+    // y si la tiene comprada direccion ya sea de envio o retiro
+    // ESTRUCTURA DEL ARCHIVO:
+    // [0] = 1 Comprador, = 2 Organizador
+    // [1] Nombre
+    // [2] Apellido
+    // [3] ID
+    // [4] Contraseña
+    // [5] Cantidad Eventos (ya sea comprados/reservados/organizados)
+    // SOLO si es Comprador
+    // [6] Email
+    // [7] Nacimiento
+    // [8] CantPreferencias
+    // [9..] Lista de preferencias
+    // [...] INTERCALADO x CantidadEventos: ID Evento, nroButaca, true/false=comprada/reservada, si el anterior es true tiene retiro/envio , direccion (ya sea de envio o retiro)
 
-    //creo que tambien va a hacer falta agregar algun metodo para recuperar los datos de algun Id dado, ya que desde afuera la registrar si los tenemos pero al iniciar sesion no.
+    // SOLO si es Organizador
+    // y despues en otro sprint el que sea organizadr va a tener las preferencias de pago y todo eso.. definir bien a futuro.
 
+    //nota a futuro: jamás hacer esto otra vez, era mas facil levantar un serverSQL y abrir los puertos en el router..
+
+    private static final int CantidadValoresFijosCSV = 6;
     private static HashMap<Comprador, String> compradoresLogin = new HashMap<>(); //mapa de cada usuario a su contraseña(super seguro!)
     private static HashMap<Organizador, String> organizadoresLogin = new HashMap<>();
     private static HashMap<String, Comprador> compradores = new HashMap<>();

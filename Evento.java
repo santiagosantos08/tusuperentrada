@@ -7,7 +7,7 @@ import java.util.Locale;
 
 public class Evento {
     private int capacidad, id, precio;
-    private String nombre, ubicacion,descripcion, imagen_url, tipo_evento;
+    private String nombre, ubicacion,descripcion, imagen_url, tipo_evento; //las fotos tiene que ser muchas!!!!!!!!!!!!! en otra entrega será
     private ArrayList<LocalDate> fechas;
     private HashMap<Integer, String> butacasOcupadas; //mapa de nroButaca -> Id comprador que la tiene.
     private String org_id;
