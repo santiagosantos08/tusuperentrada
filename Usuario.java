@@ -4,10 +4,11 @@ public class Usuario {
     private String id; //en caso del Comprador va a ser DNI, en Org va a ser CUIT/CUIL
     private String contrasenia;
 
-    Usuario(String nombre, String apellido, String id) {
+    Usuario(String nombre, String apellido, String id, String contrasenia) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.id = id;
+        this.contrasenia = contrasenia;
     }
 
     public String getContrasenia() { //nivel maximo de crotera alcanzado
