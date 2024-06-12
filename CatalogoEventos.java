@@ -27,6 +27,9 @@ public class CatalogoEventos {
         String[] data;
         try (BufferedReader br = new BufferedReader(new FileReader(archivo_eventos))){
             while ((line = br.readLine()) != null) {
+                // todo este menjunte tendria que hacer una clase que solamente maneje los archivos pero ya es tarde
+                // tengo el mismo codigo en 2 clases pero cambia q almacena cada linea del csv, tendria que agregarle mas IDS y cosas para saber q es cada una..
+                // por ahora alcanza y hace lo que necesita hacer
                 data = line.split(",");
                 int idEvento = Integer.parseInt(data[0]);
                 String idOrganizador = data[1];
