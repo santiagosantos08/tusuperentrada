@@ -7,40 +7,101 @@ import java.util.Scanner;
 /*
 CRITERIOS ACEPTACION SIN VERIFICAR:
 
-REGISTRAR:
-    Permitir que pueda acceder a actualizar sus datos e intereses en distintos tipos de eventos de forma entendible.
-INGRESAR:
-    Verificar que sea un usuario ya existente, en caso de no serlo dar la opcion de registrarse (ver user storie TU-29)
-    El usuario debe ingresar el numero de documento y contraseña
-    Verificar que se valide el numero de documento y su contraseña, en caso de ser erroneos notificar y pedir el documento y la contraseña nuevamente.
+
 RESERVAR:
-    Verificar que el comprador este ingresado en la pagina (ver user storie Tu-30)
-    Se debe de mostrar el evento y fecha
-    Se debe de mostrar el precio y la ubicacion disponibles de las entradas
-    Se debe de poder seleccionar la cantidad de entradas que quiere comprar
-    Se debe de mostrar las diferentes tarjetas de credito y sus promociones
-    Se debe de guardar todo lo que haya saleccionado el usuario,  la reserva dura unos minutos. Pasado el tiempo se liberan las entradas
-VER TIPOS ENVIO:
-    Verificar que el usuario este registrado en la pagina
-    Se debe de mostrar las diferentes formas de entrega de las entradas, estas pueden ser: retiro por sucursal o entrega a domicilio
-    Se debe poder seleccionar la opcion de entrega
-    Si el comprador selecciona retiro en sucursal de correo,  deberá indicar el código postal
-    El sistema debe calcular los costos del envio por correo interactuando con el sitio del correo oficial teniendo en cuenta el codigo postal ingresado.
-    confirmar compra (ver user storie Tu-36)
+    Se debe de mostrar las diferentes tarjetas de credito y sus promociones // entiendo que no entra para este sprint ya que no hay tarjetas como tal
+    Se debe de guardar todo lo que haya saleccionado el usuario,  la reserva dura unos minutos // aun no vence
 CONFIRMAR:
-    Se debe de visualizar la orden de compra completa
-    Se debe de mostrar las tarjetas disponibles
-    Se debe de confirmar el pago
-    Se debe marcar la entrada como no disponible
-    Guardar informacion de la compra (Usuario, fecha y entrada) en base de datos
-    Se debe notificar la compra exitosa (ver user storie Tu-37)
+    Se debe de mostrar las tarjetas disponibles // como todavia no hay tarjetas medio q imposible
+    Se debe notificar la compra exitosa (ver user storie Tu-37) // ya se notifica por pantalla, si se referia a por mail queda para despues
 
  */
 // demo de app
 public class main {
-    public static Scanner s = new Scanner(System.in);
-    private static CatalogoEventos catalogo;
+    private static Scanner s = new Scanner(System.in);
+    private static CatalogoEventos catalogo = new CatalogoEventos();
     private static HashMap<Integer, Evento> eventos;
+
+    private static void inicializarSistema(){
+        Autenticador.levantarDatos();
+        catalogo.inicializarEventos();
+        eventos = catalogo.retornarEventos();
+    }
+
+    private static void confirmarCompra(String idUsuario, Evento e, ArrayList<Integer> butacas){
+        print(e.getNombre()+" butacas: "+butacas.toString());
+        print(" TOTAL entradas $$$ = "+butacas.size()*e.getPrecio());
+        print(" ¿Quiere [r]etirar sus entradas o un [e]nvio a domicilio? ");
+        print(" Aún puede cancelar la compra con [c] ");
+        String opcion = s.nextLine();
+        String envio;
+        if(opcion.equals("r")){
+            print(" Indique su codigo postal, la terminal de retiro mas cercana a ud será enviada por email"); //es mentira!!! todo mockup
+            envio = s.nextLine();
+            Envio env = new Envio(true,envio);
+            for(Integer i : butacas){
+                e.getButacasOcupadas().put(i,idUsuario);
+                Autenticador.getCompradores().get(idUsuario).addCompra(e.getId(),i);
+            }
+            Autenticador.getCompradores().get(idUsuario).addEnvio(e.getId(),env);
+        }else if(opcion.equals("e")){
+            print(" Indique su dirección en formato Cod.postal-Calle-Nro-Piso-Dpto");
+            envio = s.nextLine();
+            Envio env = new Envio(false,envio);
+            print(" Costo de envio $$$ se cobrará cuando llegue el paquete."); //ver como calcular esto, dice que se usa un sistema del correo en el enunciado (?? supongo se podrá inventar cualq numero para la demo
+            for(Integer i : butacas){
+                e.getButacasOcupadas().put(i,idUsuario);
+                Autenticador.getCompradores().get(idUsuario).addCompra(e.getId(),i);
+            }
+            Autenticador.getCompradores().get(idUsuario).addEnvio(e.getId(),env);
+        }else{
+            print(" Compra Cancelada.");
+        }
+    }
+
+    private static void countDownReserva(String idUsuario, Evento e, ArrayList<Integer> butacas){
+        //ver como hacer la barrita que se vaya llenando, por ahora no vencen las reservas
+        print(" Reservando para "+e.getNombre());
+        print(" Ingrese número de tarjeta de credito: ");
+        String nroTarjeta = s.nextLine();
+        print(" Ingrese mes vto de la tarjeta: ");
+        String mVto = s.nextLine();
+        print(" Ingrese año vto de la tarjeta: ");
+        String aVto = s.nextLine();
+        print(" Ingrese codigo de seguridad de la tarjeta: ");
+        String ccv = s.nextLine();
+        // hacer validacion, por ahora pasa todo je
+        print(" Ingrese [c] para cancelar la reserva [s] para confirmar el pago");
+        String opcion = s.nextLine();
+        if(opcion.equals("s")){
+            confirmarCompra(idUsuario, e, butacas);
+        }
+    }
+
+    private static void pantallaReservar(String idUsuario, Evento e){
+        print(" Asientos disponibles en "+e.getNombre()+" para "+e.getFechas().getFirst());
+        //TODO: verificar que si no hay lugares se imprima antes un aviso que esta full
+        for(int i = 0; i < e.getCapacidad(); i++){
+            if(i % 15 == 0){print("");}
+            if(!e.getButacasOcupadas().containsKey(i)){
+                System.out.print(i);
+            }
+        }
+        print(" Ingrese cantidad de entradas que quiere comprar. "); //TODO: verificar que no sea mayor a la cantidad disponible..
+        String cantidad = s.nextLine();
+        print(" Ingrese un número de butaca para crear una reserva. [c] para volver atrás");
+        String opcion = s.nextLine();
+        if(opcion.equals("c")){
+            print(" Volviendo al menu principal");
+        }else{
+            ArrayList<Integer> butacasReservadas = new ArrayList<>();
+            for(int i = 0; i < Integer.parseInt(cantidad); i++){
+                print(" Ingrese numero de butaca para su entrada n "+i+1);
+                butacasReservadas.add(Integer.parseInt(s.nextLine()));
+            }
+            countDownReserva(idUsuario, e, butacasReservadas);
+        }
+    };
 
     private static void printEventoLogueado(Evento e, int nroLista){
         print("==[ "+nroLista+" ]=================================================================================");
@@ -128,14 +189,18 @@ public class main {
         boolean cerrarSesion = false;
         while(!cerrarSesion){
             print(" Bienvenidx "+Autenticador.getCompradores().getOrDefault(id, null).getNombre()+"   Ingresá [d] para mofidicar tus datos personales, o elegí un evento:");
-            int i = 1;
             for(Map.Entry<Integer, Evento> entry : eventos.entrySet()){
                 Evento e = entry.getValue();
-                printEventoLogueado(e, i);
-                i++;
+                printEventoLogueado(e, entry.getKey());
+
             }
+            print(" Ingresá el número de evento para expandirlo ");
             String opcion = s.nextLine();
-            if(opcion.equals("d")){modificarDatosPersonales(id);}
+            if(opcion.equals("d")){
+                modificarDatosPersonales(id);
+            }else{
+                pantallaReservar(id, eventos.get(opcion));
+            }
 
 
         }
@@ -147,15 +212,16 @@ public class main {
     }
 
     public static void main(String[] args){
+        inicializarSistema();
         boolean run = true;
         while(run){
 
             System.out.println(" Bienvenidx a TUSUPERENTRADA ");
-            System.out.println(" ej ev1: nombre dd/mm/aaaa lugar imagen ");
-            System.out.println(" ej ev2: nombre dd/mm/aaaa lugar imagen ");
-            System.out.println(" ej ev3: nombre dd/mm/aaaa lugar imagen ");
-            System.out.println(" ej ev4: nombre dd/mm/aaaa lugar imagen ");
-            System.out.println(" ej ev5: nombre dd/mm/aaaa lugar imagen ");
+            System.out.println(" Vista general, aún no iniciaste sesión ");
+            System.out.println(" Preview de eventos: ");
+            for(Map.Entry<Integer,Evento> entry : eventos.entrySet()){
+                printEventoGeneral(entry.getValue(), entry.getKey());
+            }
             System.out.println(" Presione 1 para inciar sesion ");
             System.out.println(" Presione 2 para registrarse ");
             System.out.println(" Presione 3 para salir ");
@@ -170,24 +236,27 @@ public class main {
 
                 if(status == 1){
                     pantallaCompradorInicioSesion(id,false);
-                    String seleccion = s.nextLine();
                     System.out.println(" Ingrese cualquier caracter para volver atrás (cerrar sesion) ");
+                    String seleccion = s.nextLine();
                 }else if(status == 2){
                     pantallaOrganizadorInicioSesion();
-                    String seleccion = s.nextLine();
                     System.out.println(" Ingrese cualquier caracter para volver atrás (cerrar sesion) ");
+                    String seleccion = s.nextLine();
                 }else if(status == 3){
                     System.out.println(" El usuario con dicho ID existe pero la contraseña es incorrecta ");
-                    String seleccion = s.nextLine();
                     System.out.println(" Ingrese cualquier caracter para volver atrás y reintentar ");
+                    String seleccion = s.nextLine();
+
                 }else if(status == 4){
                     System.out.println(" ID de logitud invalida, por favor verifique los datos ");
-                    String seleccion = s.nextLine();
                     System.out.println(" Ingrese cualquier caracter para volver atrás y reintentar ");
+                    String seleccion = s.nextLine();
+
                 }else if(status == 5){
                     System.out.println(" El usuario con dicho ID no existe, por favor, registrese o verifique los datos ");
-                    String seleccion = s.nextLine();
                     System.out.println(" Ingrese cualquier caracter para volver atrás y reintentar ");
+                    String seleccion = s.nextLine();
+
                 }
             }else if(opcion.equals("2")){
                 System.out.println(" Ingrese su nombre ");
@@ -236,5 +305,6 @@ public class main {
             }
         }
         Autenticador.guardarDatos();
+        catalogo.guardarDatos();
     }
 }

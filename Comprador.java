@@ -27,6 +27,14 @@ public class Comprador extends Usuario{
         return email;
     }
 
+    public void addEnvio(Integer idEvento, Envio e){
+        envios.put(idEvento,e);
+    }
+
+    public void addCompra(Integer idEvento, Integer nroButaca){
+        this.compras.put(idEvento, nroButaca);
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
