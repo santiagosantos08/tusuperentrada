@@ -1,76 +1,19 @@
 
 import java.time.LocalDate;
-/*
-public class Evento {
-    public class Evento {
-        // Atributos
-        private String nombre;
-        private LocalDate fecha;
-        private String ubicacion;
-        private String descripcion;
 
-        // Constructor
-        public Evento(String nombre, LocalDate fecha, String ubicacion, String descripcion) {
-            this.nombre = nombre;
-            this.fecha = fecha;
-            this.ubicacion = ubicacion;
-            this.descripcion = descripcion;
-        }
-
-        // Getters y Setters
-        public String getNombre() {
-            return nombre;
-        }
-
-        public void setNombre(String nombre) {
-            this.nombre = nombre;
-        }
-
-        public LocalDate getFecha() {
-            return fecha;
-        }
-
-        public void setFecha(LocalDate fecha) {
-            this.fecha = fecha;
-        }
-
-        public String getUbicacion() {
-            return ubicacion;
-        }
-
-        public void setUbicacion(String ubicacion) {
-            this.ubicacion = ubicacion;
-        }
-
-        public String getDescripcion() {
-            return descripcion;
-        }
-
-        public void setDescripcion(String descripcion) {
-            this.descripcion = descripcion;
-        }
-
-        // Método toString para imprimir los detalles del evento
-        @Override
-        public String toString() {
-            return "Evento{" +
-                    "nombre='" + nombre + '\'' +
-                    ", fecha=" + fecha +
-                    ", ubicacion='" + ubicacion + '\'' +
-                    ", descripcion='" + descripcion + '\'' +
-                    '}';
-        }
-}
-*/
 import java.util.ArrayList;
-public class Evento {
-    private int capacidad, id;
-    private ArrayList<Boolean> asientos;
-    private String nombre, ubicacion,descripcion, imagen_url, tipo_evento;
-    private LocalDate fecha;//Cambiar por una lista
-    private Organizador org;
+import java.util.HashMap;
+import java.util.Locale;
 
-    public Evento(int capacidad, String nombre, String ubicacion, String descripcion, String imagen_url, String tipo_evento, LocalDate fecha, int id, Organizador org, ArrayList<Boolean> asientos) {
+public class Evento {
+    private int capacidad, id, precio;
+    private String nombre, ubicacion,descripcion, imagen_url, tipo_evento;
+    private ArrayList<LocalDate> fechas;
+    private HashMap<Integer, String> butacasOcupadas; //mapa de nroButaca -> Id comprador que la tiene.
+    private String org_id;
+
+    public Evento(int capacidad, String nombre, String ubicacion, String descripcion, String imagen_url,
+                  String tipo_evento, ArrayList<LocalDate> fechas, int id, String org_id, HashMap<Integer,String> asientos) {
         //chequear que ninguno de los String tenga comas!!!!!!
         this.capacidad = capacidad;
         this.nombre = nombre;
@@ -78,22 +21,30 @@ public class Evento {
         this.descripcion = descripcion;
         this.imagen_url = imagen_url;
         this.tipo_evento = tipo_evento;
-        this.fecha = fecha;
-        if (asientos != null){ //cuando se crea desde la interfaz se le tiene que pasar null
-            this.asientos = asientos;
-        }else {
-            this.asientos = new ArrayList<>(capacidad);
+        if(fechas != null){
+            this.fechas = fechas;
+        }else{
+            this.fechas = new ArrayList<>();
         }
-        for (int i = 0; i < capacidad; i++) {
-            asientos.add(true);
+        if (asientos != null){ //cuando se crea desde la interfaz se le tiene que pasar null
+            this.butacasOcupadas = asientos;
+        }else{
+            this.butacasOcupadas = new HashMap<>();
         }
         this.id = id;
-        this.org = org;
+        this.org_id = org_id;
+    }
+
+    public int getPrecio(){
+        return this.precio;
+    }
+
+    public String getOrg_id(){
+        return org_id;
     }
 
     public int getCantFunciones(){
-        return 1;
-        //aca cuando se pase de fecha a lista de fechas hay que hacer q retorne el lenght de la lista de fechas, importantisimo para que se guarde bien!!!
+        return this.fechas.size();
     }
 
     public int getCapacidad() {
@@ -120,26 +71,49 @@ public class Evento {
         return tipo_evento;
     }
 
-    public LocalDate getFecha() {
-        return fecha;
+    public ArrayList<LocalDate> getFechas() {
+        return this.fechas;
     }
 
     public int getId() {
         return id;
     }
 
-    public ArrayList<Boolean> getListaAsientos(){
-        return this.asientos;
+    public HashMap<Integer, String> getButacasOcupadas(){
+        return this.butacasOcupadas;
+    }
+    //acomodar esto!°!
+    public boolean asientoDisponible(int nro_asiento) {
+        if (nro_asiento <= 0 || nro_asiento > capacidad){
+            return false;
+        }
+        return butacasOcupadas.containsKey(nro_asiento-1);
+
+    }
+    public boolean seleccionarAsiento(int nro_asiento, String idComprador) {
+        if (nro_asiento > 0 || nro_asiento <= capacidad) {
+            if (asientoDisponible(nro_asiento)) {
+                butacasOcupadas.put(nro_asiento-1,idComprador);
+            }
+        }
+        return false;
+    }
+    public int getCantButacasOcupadas(){
+        return butacasOcupadas.size();
     }
 
-    public boolean asientoDisponible(int nro_asiento) {
-        if (nro_asiento <= 0 || nro_asiento > capacidad)
-            return false;
-        return this.asientos.get(nro_asiento-1);
-    }
-    public void seleccionarAsiento(int nro_asiento) {
-        if (nro_asiento > 0 || nro_asiento <= capacidad)
-            this.asientos.set(nro_asiento-1, false);
+    public String toString() {
+        String fechasEvento = "";
+        for(LocalDate l : fechas){
+            fechasEvento = fechasEvento.concat(l.toString() + "|");
+        }
+        return "Evento{" +
+                "nombre='" + nombre + '\'' +
+                ", fechas=" + fechasEvento +
+                ", ubicacion='" + ubicacion + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                ", precio='" + precio + '\''+
+                '}';
     }
 
 }
