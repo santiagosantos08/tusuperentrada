@@ -7,18 +7,19 @@ import java.util.*;
 
 public class CatalogoEventos {
     //estructura del CSV de eventos
-    //ID evento, ID organizador, capacidad, nombre, ubicacion, descrpcion, iamgen_url, tipo_evento, precio, cant_funciones,cantUsuariosCompraron, fecha/s, IDS de usuarios que lo compraron y el nro de asiento (intercalado)
-    private HashSet<Evento> eventos;
+    //ID evento, ID organizador, capacidad, nombre, ubicacion, descrpcion, iamgen_url, tipo_evento, precio, cant_funciones,cantUsuariosCompraron,
+    // fecha/s, IDS de usuarios que lo compraron y el nro de asiento (intercalado)
+    private HashMap<Integer, Evento> eventos; // es redundante guardar el ID ya que lo tiene el evento pero hace ams facil buscar por id, quizá haya que sacarlo como atributo de evento.
 
     public CatalogoEventos(){
-        this.eventos = new HashSet<>();
+        this.eventos = new HashMap<>();
     }
 
     private final String archivo_eventos = "eventos.csv";
     private final int cantValoresFijosCSV = 11; //cantidad de cosas que hay antes de que se almacenen los datos variables en el csv
 
     public void agregarEvento(Evento evento){
-        eventos.add(evento);
+        eventos.put(evento.getId(),evento);
     }
 
     public boolean inicializarEventos(){ //mover al constructor?? pero despues va a quedar raor tener que usar obligastoriamene a mano el guardar :/
@@ -50,7 +51,7 @@ public class CatalogoEventos {
                     // IDEA: hacer que cuando se construye un evento que no tiene organizador ni usuarios null ya el const de dicho evento se encargue de agregarle ahi
                 }
                 Evento nuevo = new Evento(capacidad,nombreEvento,ubicacion,descripcion,urlImagen,tipoEvento,fechas,idEvento,idOrganizador,butacas);
-                eventos.add(nuevo);
+                eventos.put(nuevo.getId(),nuevo);
             }
             return true;
         } catch (IOException e) {
@@ -59,14 +60,14 @@ public class CatalogoEventos {
         return false;
     }
 
-    //Esto tendria que retornar una copia para no romper el encapsulamiento
-    public ArrayList<Evento> retornarEventos(){
-        return new ArrayList<>(eventos);
+    public HashMap<Integer, Evento> retornarEventos(){
+        return this.eventos;
     }
 
     public boolean guardarDatos(){
         try (FileWriter writer = new FileWriter(archivo_eventos,false)){
-            for(Evento e : eventos){
+            for(Map.Entry<Integer, Evento> entry : eventos.entrySet()){
+                Evento e = entry.getValue();
                 StringBuilder eLine = new StringBuilder();
                 eLine.append(e.getId()).append(",");
                 eLine.append(e.getOrg_id()).append(",");
@@ -84,9 +85,9 @@ public class CatalogoEventos {
                 for(LocalDate l : fechas){
                     eLine.append(l.toString()).append(",");
                 }
-                for(Map.Entry<Integer, String> entry : butacas.entrySet()){
-                    eLine.append(entry.getValue()).append(",");
-                    eLine.append(entry.getKey()).append(",");
+                for(Map.Entry<Integer, String> entryButacas : butacas.entrySet()){
+                    eLine.append(entryButacas.getValue()).append(",");
+                    eLine.append(entryButacas.getKey()).append(",");
                 }
                 eLine.setLength(eLine.length() - 1); //saca la ultima coma, haria falta verificar que no sea 0 -> -1 pero buee muy edge case
                 eLine.append("\n");

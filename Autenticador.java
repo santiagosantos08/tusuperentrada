@@ -26,6 +26,8 @@ public class Autenticador {
 
     private static HashMap<Comprador, String> compradoresLogin = new HashMap<>(); //mapa de cada usuario a su contraseña(super seguro!)
     private static HashMap<Organizador, String> organizadoresLogin = new HashMap<>();
+    private static HashMap<String, Comprador> compradores = new HashMap<>();
+    private static HashMap<String, Organizador> organizadores = new HashMap<>();
 
     public static boolean guardarDatos(){
         try (FileWriter writer = new FileWriter("user_data.csv",false)){
