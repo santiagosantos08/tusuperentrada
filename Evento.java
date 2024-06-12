@@ -70,7 +70,7 @@ public class Evento {
     private LocalDate fecha;//Cambiar por una lista
     private Organizador org;
 
-    public Evento(int capacidad, String nombre, String ubicacion, String descripcion, String imagen_url, String tipo_evento, LocalDate fecha, int id, Organizador org) {
+    public Evento(int capacidad, String nombre, String ubicacion, String descripcion, String imagen_url, String tipo_evento, LocalDate fecha, int id, Organizador org, ArrayList<Boolean> asientos) {
         //chequear que ninguno de los String tenga comas!!!!!!
         this.capacidad = capacidad;
         this.nombre = nombre;
@@ -79,7 +79,11 @@ public class Evento {
         this.imagen_url = imagen_url;
         this.tipo_evento = tipo_evento;
         this.fecha = fecha;
-        this.asientos = new ArrayList<>(capacidad);
+        if (asientos != null){ //cuando se crea desde la interfaz se le tiene que pasar null
+            this.asientos = asientos;
+        }else {
+            this.asientos = new ArrayList<>(capacidad);
+        }
         for (int i = 0; i < capacidad; i++) {
             asientos.add(true);
         }
