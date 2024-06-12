@@ -47,6 +47,22 @@ public class Autenticador {
     private static HashMap<String, Comprador> compradores = new HashMap<>();
     private static HashMap<String, Organizador> organizadores = new HashMap<>();
 
+    public static HashMap<String, Comprador> getCompradores() {
+        return compradores;
+    }
+
+    public static void setCompradores(HashMap<String, Comprador> compradores) {
+        Autenticador.compradores = compradores;
+    }
+
+    public static HashMap<String, Organizador> getOrganizadores() {
+        return organizadores;
+    }
+
+    public static void setOrganizadores(HashMap<String, Organizador> organizadores) {
+        Autenticador.organizadores = organizadores;
+    }
+
     public static boolean guardarDatos(){
         try (FileWriter writer = new FileWriter("user_data.csv",false)){
             for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
