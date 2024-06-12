@@ -47,7 +47,7 @@ public class CatalogoEventos {
                 for(int i = 0; i < cantFunciones; i++){
                     fechas.add(LocalDate.parse(data[cantValoresFijosCSV + i]));
                 }
-                for(int i = 0; i < cantCompradores; i = i+2){
+                for(int i = 0; i < cantCompradores * 2; i = i+2){
                     butacas.put(Integer.parseInt(data[cantValoresFijosCSV + cantFunciones + i + 1]),data[cantValoresFijosCSV + cantFunciones + i]);
                     //TODO: buscar al usuario con dicho ID y cargarle el evento, por ahora el metodo para buscar usuarios por id es muy malo, cambiar a un  hashShet
                     //aplica tanto para comprador como vendedor

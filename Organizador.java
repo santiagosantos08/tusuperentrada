@@ -1,7 +1,18 @@
+import java.util.HashSet;
+
 public class Organizador extends Usuario{
-    Organizador(String nombre, String apellido, String Id){
-        super(nombre, apellido, Id);
+    private HashSet<Integer> eventos;
+    Organizador(String nombre, String apellido, String Id, String contrasenia){
+        super(nombre, apellido, Id, contrasenia);
         // this.prefenrecias de pago.. etc completar
         //por ahora solo se creo para poder completar autenticador
     };
+
+    public HashSet<Integer> getEventos() {
+        return eventos;
+    }
+
+    public void setEventos(HashSet<Integer> eventos) {
+        this.eventos = eventos;
+    }
 }
