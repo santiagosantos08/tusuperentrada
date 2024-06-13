@@ -5,8 +5,8 @@ import java.time.*;
 public class main {
     //...
     static ArrayList<Evento> eventos = new ArrayList<>();
-
-    public static void pantallaCompradorInicioSesion() {
+    static ArrayList<Comprador> compradores = new ArrayList<>();
+    public static void pantallaCompradorInicioSesion(Comprador comprador) {
         System.out.println("Ingrese la opcion que desea realizar");
         System.out.println("1) Ver Eventos");
         System.out.println("2) Reservar evento");
@@ -21,20 +21,22 @@ public class main {
 
             while (!s.hasNextInt()) {
                 System.out.println("Por favor, ingrese un número válido para el evento:");
-                s.next(); // Descarta la entrada no válida
+                s.next();
             }
             int e = s.nextInt();
-            s.nextLine(); // Consumir el salto de línea
+            s.nextLine();
 
             System.out.println("Ingrese el numero de asiento");
             while (!s.hasNextInt()) {
                 System.out.println("Por favor, ingrese un número válido para el asiento:");
-                s.next(); // Descarta la entrada no válida
+                s.next();
             }
             int asiento = s.nextInt();
-            s.nextLine(); // Consumir el salto de línea
-            //comprador.reservarEvento(eventos.get(e), asiento);
-
+            s.nextLine();
+            if(comprador.reservarEvento(eventos.get(e), asiento))
+                System.out.println("Reservado");
+            else
+                System.out.println("No se pudo reservar tu evento");
         }
     }
 
@@ -89,9 +91,9 @@ public class main {
                 int status = Autenticador.loginValido(id,pwd);
 
                 if(status == 1){
-                    pantallaCompradorInicioSesion();
-                    String seleccion = s.nextLine();
+                    pantallaCompradorInicioSesion(compradores.get(0));
                     System.out.println(" Ingrese cualquier caracter para volver atrás (cerrar sesion) \n");
+                    String seleccion = s.nextLine();
                 }else if(status == 2){
                     pantallaOrganizadorInicioSesion();
                     String seleccion = s.nextLine();
@@ -133,6 +135,8 @@ public class main {
                 status = Autenticador.registroExitoso(nombre, apellido, id, Integer.parseInt(tipoUsuario), password);
                 if(status == 1){
                     System.out.println(" Registro exitoso, por favor vuelva al menu principal para inciar sesion \n");
+                    Comprador comprador = new Comprador(nombre,apellido, id);
+                    compradores.add(comprador);
                     String seleccion = s.nextLine();
                     System.out.println(" Ingrese cualquier caracter para volver atrás \n");
                 }else if(status == 2){
