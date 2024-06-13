@@ -1,15 +1,59 @@
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.time.*;
 // demo de app
 public class main {
     //...
-    public static void pantallaCompradorInicioSesion(){ // aca en una verison mas completa iria el nombre etc para que lo muestre
-        System.out.println(" Pantalla de ejemplo comprador que ya inició sesión \n");
-        System.out.println(" ej ev1: detalles avanzados \n");
-        System.out.println(" ej ev2: detalles avanzados \n");
-        System.out.println(" ej ev3: detalles avanzados \n");
-        System.out.println(" ej ev4: detalles avanzados \n");
-        System.out.println(" ej ev5: detalles avanzados \n");
+    static ArrayList<Evento> eventos = new ArrayList<>();
+
+    public static void pantallaCompradorInicioSesion(Comprador comprador) {
+        System.out.println("Ingrese la opcion que desea realizar");
+        System.out.println("1) Ver Eventos");
+        System.out.println("2) Reservar evento");
+        Scanner s = new Scanner(System.in);
+        String opcion = s.nextLine();
+
+        if (opcion.equals("1")) {
+            leerDatosEventos(eventos);
+        } else if (opcion.equals("2")) {
+            leerDatosEventos(eventos);
+            System.out.println("Ingrese el numero del evento del cual desea reservar la entrada");
+
+            while (!s.hasNextInt()) {
+                System.out.println("Por favor, ingrese un número válido para el evento:");
+                s.next(); // Descarta la entrada no válida
+            }
+            int e = s.nextInt();
+            s.nextLine(); // Consumir el salto de línea
+
+            System.out.println("Ingrese el numero de asiento");
+            while (!s.hasNextInt()) {
+                System.out.println("Por favor, ingrese un número válido para el asiento:");
+                s.next(); // Descarta la entrada no válida
+            }
+            int asiento = s.nextInt();
+            s.nextLine(); // Consumir el salto de línea
+            comprador.reservarEvento(e, asiento);
+
+        }
     }
+
+    public static void leerDatosEventos(ArrayList<Evento> eventos) {
+            int i = 1;
+        for (Evento evento : eventos) {
+            System.out.println("Evento " + i);
+            System.out.println("Nombre: " + evento.getNombre());
+            System.out.println("Ubicacion: " + evento.getUbicacion());
+            System.out.println("Descripcion: " + evento.getDescripcion());
+            System.out.println("Imagen URL: " + evento.getImagen_url());
+            System.out.println("Tipo de Evento: " + evento.getTipo_evento());
+            System.out.println("Fecha: " + evento.getFecha());
+            System.out.println("Capacidad: " + evento.getCapacidad());
+            System.out.println("--------------------------");
+            i++;
+        }
+    }
+
     public static void pantallaOrganizadorInicioSesion(){
         System.out.println(" Pantalla de ejemplo organizador que ya inició sesión \n");
         System.out.println(" ej actividades de organizador: editar eventos etc; no es para este sprint \n");
@@ -17,14 +61,21 @@ public class main {
     public static void main(String[] args){
         Scanner s = new Scanner(System.in);
         boolean run = true;
+
+        Evento event1 = new Evento(100, "Concert in the Park", "Central Park", "A live concert featuring local bands.", "http://example.com/concert.jpg", "Music", LocalDate.of(2024, 6, 20), 1);
+        Evento event2 = new Evento(200, "Art Exhibition", "City Gallery", "Exhibition of contemporary art.", "http://example.com/art.jpg", "Art", LocalDate.of(2024, 7, 15), 2);
+        Evento event3 = new Evento(150, "Tech Conference", "Convention Center", "Annual tech conference with keynotes and workshops.", "http://example.com/tech.jpg", "Conference", LocalDate.of(2024, 8, 10), 3);
+        Evento event4 = new Evento(120, "Food Festival", "Downtown Plaza", "A festival showcasing food from around the world.", "http://example.com/food.jpg", "Festival", LocalDate.of(2024, 9, 5), 4);
+        Evento event5 = new Evento(80, "Book Fair", "Library", "Book fair with author signings and readings.", "http://example.com/books.jpg", "Fair", LocalDate.of(2024, 10, 25), 5);
+        eventos.add(event1);
+        eventos.add(event2);
+        eventos.add(event3);
+        eventos.add(event4);
+        eventos.add(event5);
         while(run){
 
             System.out.println(" Pantalla de Inicio de ejemplo sin iniciar sesión, acá se mostrarian solos los detalles principales de los eventos \n");
-            System.out.println(" ej ev1: nombre dd/mm/aaaa lugar imagen \n");
-            System.out.println(" ej ev2: nombre dd/mm/aaaa lugar imagen \n");
-            System.out.println(" ej ev3: nombre dd/mm/aaaa lugar imagen \n");
-            System.out.println(" ej ev4: nombre dd/mm/aaaa lugar imagen \n");
-            System.out.println(" ej ev5: nombre dd/mm/aaaa lugar imagen \n");
+            leerDatosEventos(eventos);
             System.out.println(" Presione 1 para inciar sesion \n");
             System.out.println(" Presione 2 para registrarse \n");
             System.out.println(" Presione 3 para salir \n");
@@ -104,6 +155,7 @@ public class main {
             }else if(opcion.equals("3")){
                 run = false;
             }
+            else {run = false;}
         }
         Autenticador.guardarDatos();
     }
