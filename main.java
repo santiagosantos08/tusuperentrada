@@ -6,7 +6,7 @@ public class main {
     //...
     static ArrayList<Evento> eventos = new ArrayList<>();
 
-    public static void pantallaCompradorInicioSesion(Comprador comprador) {
+    public static void pantallaCompradorInicioSesion() {
         System.out.println("Ingrese la opcion que desea realizar");
         System.out.println("1) Ver Eventos");
         System.out.println("2) Reservar evento");
