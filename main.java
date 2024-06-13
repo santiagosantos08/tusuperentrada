@@ -33,7 +33,7 @@ public class main {
             }
             int asiento = s.nextInt();
             s.nextLine(); // Consumir el salto de línea
-            comprador.reservarEvento(eventos.get(e), asiento);
+            //comprador.reservarEvento(eventos.get(e), asiento);
 
         }
     }
