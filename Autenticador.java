@@ -51,8 +51,178 @@ public class Autenticador {
         Autenticador.organizadores = organizadores;
     }
 
-    public static boolean guardarDatos(){
-        try (FileWriter writer = new FileWriter("user_data.csv",false)){
+    public static boolean guardarDatos() {
+        String rutaArchivo = "C:/Users/const/IdeaProjects/tusuperentrada/user_data.csv";
+        try (FileWriter writer = new FileWriter(rutaArchivo, true)) {
+            // Verificar si hay compradores
+            if (compradores.isEmpty()) {
+                System.out.println("No hay compradores para guardar.");
+            } else {
+                // Escribir datos de Comprador
+                for (Map.Entry<String, Comprador> entry : compradores.entrySet()) {
+                    Comprador comprador = entry.getValue();
+                    int eventosRelacionados = comprador.getCompras().size() + comprador.getReservas().size();
+                    StringBuilder userLine = new StringBuilder();
+
+                    userLine.append("1,")
+                            .append(comprador.getNombre()).append(",")
+                            .append(comprador.getApellido()).append(",")
+                            .append(comprador.getId()).append(",")
+                            .append(comprador.getContrasenia()).append(",")
+                            .append(eventosRelacionados).append(",")
+                            .append(comprador.getEmail()).append(",")
+                            .append(comprador.getFecha_nacimiento()).append(",")
+                            .append(comprador.getPreferencias().size()).append(",");
+
+                    // Manejar Compras
+                    for (Map.Entry<Integer, Integer> e1 : comprador.getCompras().entrySet()) {
+                        int eventId = e1.getKey();
+                        int seatNumber = e1.getValue();
+                        Envio envio = comprador.getEnvios().getOrDefault(eventId, new Envio(false, "", comprador.getNombre(), comprador.getApellido(), comprador.getId()));
+
+                        userLine.append(eventId).append(",")
+                                .append(seatNumber).append(",")
+                                .append("true,")
+                                .append(envio.isRetiraPorSucursal()).append(",")
+                                .append(envio.getDireccion()).append(",");
+                    }
+
+                    // Manejar Reservas
+                    for (Map.Entry<Integer, Integer> e1 : comprador.getReservas().entrySet()) {
+                        userLine.append(e1.getKey()).append(",")
+                                .append(e1.getValue()).append(",")
+                                .append("false,")
+                                .append("false,")
+                                .append("N/A,");
+                    }
+
+                    // Eliminar el último carácter ","
+                    userLine.setLength(userLine.length() - 1);
+                    userLine.append("\n");
+
+                    String entradaCSV = userLine.toString();
+                    writer.write(entradaCSV);
+                    writer.flush(); // Asegurarse de que se escriba en el archivo
+                    System.out.println("Datos del comprador " + comprador.getId() + " guardados.");
+                }
+            }
+
+            // Escribir datos de Organizador
+            if (organizadores.isEmpty()) {
+                System.out.println("No hay organizadores para guardar.");
+            } else {
+                for (Map.Entry<String, Organizador> entry : organizadores.entrySet()) {
+                    Organizador organizador = entry.getValue();
+                    StringBuilder userLine = new StringBuilder();
+
+                    userLine.append("2,")
+                            .append(organizador.getNombre()).append(",")
+                            .append(organizador.getApellido()).append(",")
+                            .append(organizador.getId()).append(",")
+                            .append(organizador.getContrasenia()).append(",")
+                            .append(organizador.getEventos().size()).append(",");
+
+                    for (Integer i : organizador.getEventos()) {
+                        userLine.append(i).append(",");
+                    }
+
+                    // Eliminar el último carácter ","
+                    userLine.setLength(userLine.length() - 1);
+                    userLine.append("\n");
+
+                    String entradaCSV = userLine.toString();
+                    writer.write(entradaCSV);
+                    writer.flush(); // Asegurarse de que se escriba en el archivo
+                    System.out.println("Datos del organizador " + organizador.getId() + " guardados.");
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error al guardar los datos: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    /*public static boolean guardarDatos() {
+        try (FileWriter writer = new FileWriter("C:/Users/const/IdeaProjects/tusuperentrada/user_data.csv", true)) {
+            // Escribir datos de Comprador
+            for (Map.Entry<String, Comprador> entry : compradores.entrySet()) {
+                Comprador comprador = entry.getValue();
+                int eventosRelacionados = comprador.getCompras().size() + comprador.getReservas().size();
+                StringBuilder userLine = new StringBuilder();
+
+                userLine.append("1,")
+                        .append(comprador.getNombre()).append(",")
+                        .append(comprador.getApellido()).append(",")
+                        .append(comprador.getId()).append(",")
+                        .append(comprador.getContrasenia()).append(",")
+                        .append(eventosRelacionados).append(",")
+                        .append(comprador.getEmail()).append(",")
+                        .append(comprador.getFecha_nacimiento()).append(",")
+                        .append(comprador.getPreferencias().size()).append(",");
+
+                // Manejar Compras
+                for (Map.Entry<Integer, Integer> e1 : comprador.getCompras().entrySet()) {
+                    int eventId = e1.getKey();
+                    int seatNumber = e1.getValue();
+                    Envio envio = comprador.getEnvios().getOrDefault(eventId, new Envio(false, "", comprador.getNombre(), comprador.getApellido(), comprador.getId()));
+
+                    userLine.append(eventId).append(",")
+                            .append(seatNumber).append(",")
+                            .append("true,")
+                            .append(envio.isRetiraPorSucursal()).append(",")
+                            .append(envio.getDireccion()).append(",");
+                }
+
+                // Manejar Reservas
+                for (Map.Entry<Integer, Integer> e1 : comprador.getReservas().entrySet()) {
+                    userLine.append(e1.getKey()).append(",")
+                            .append(e1.getValue()).append(",")
+                            .append("false,")
+                            .append("false,")
+                            .append("N/A,");
+                }
+
+                // Eliminar el último carácter ","
+                userLine.setLength(userLine.length() - 1);
+                userLine.append("\n");
+
+                String entradaCSV = userLine.toString();
+                writer.write(entradaCSV);
+            }
+
+            // Escribir datos de Organizador
+            for (Map.Entry<String, Organizador> entry : organizadores.entrySet()) {
+                Organizador organizador = entry.getValue();
+                StringBuilder userLine = new StringBuilder();
+
+                userLine.append("2,")
+                        .append(organizador.getNombre()).append(",")
+                        .append(organizador.getApellido()).append(",")
+                        .append(organizador.getId()).append(",")
+                        .append(organizador.getContrasenia()).append(",")
+                        .append(organizador.getEventos().size()).append(",");
+
+                for (Integer i : organizador.getEventos()) {
+                    userLine.append(i).append(",");
+                }
+
+                // Eliminar el último carácter ","
+                userLine.setLength(userLine.length() - 1);
+                userLine.append("\n");
+
+                String entradaCSV = userLine.toString();
+                writer.write(entradaCSV);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }*/
+/*    public static boolean guardarDatos(){
+        try (FileWriter writer = new FileWriter("user_data.csv", true)){
             for(Map.Entry<String,Comprador> entry : compradores.entrySet()){
                 Comprador comprador;
                 comprador = entry.getValue();
@@ -72,9 +242,9 @@ public class Autenticador {
                     userLine.append(e1.getKey()).append(",");
                     userLine.append(e1.getValue()).append(",");
                     userLine.append("true").append(",");
-                    userLine.append(comprador.getEnvios().getOrDefault(e1.getKey(),new Envio(false,"")).isRetiraPorSucursal()).append(",");
+                    userLine.append(comprador.getEnvios().getOrDefault(e1.getKey(),new Envio(false,"", comprador.getNombre(), comprador.getApellido(),comprador.getId())).isRetiraPorSucursal()).append(",");
                     //el default ese no deberia pasar NUNCA pero prefiero esto antes que crashee el programa
-                    userLine.append(comprador.getEnvios().getOrDefault(e1.getKey(),new Envio(false,"")).getDireccion()).append(",");
+                    userLine.append(comprador.getEnvios().getOrDefault(e1.getKey(),new Envio(false,"",comprador.getNombre(), comprador.getApellido(),comprador.getId())).getDireccion()).append(",");
                 }
                 for(Map.Entry<Integer, Integer> e1 : comprador.getReservas().entrySet()){
                     userLine.append(e1.getKey()).append(",");
@@ -110,7 +280,8 @@ public class Autenticador {
             e.printStackTrace();
         }
         return false;
-    };
+    }*/
+
 
     public static boolean levantarDatos(){
         String csvFile = "user_data.csv";
@@ -162,7 +333,7 @@ public class Autenticador {
                         String direccion = data[i+4];
                         if(compraConfirmada){
                             comprasConfirmadas.put(idEvento,nroButaca);
-                            envios.put(idEvento, new Envio(retiraPorSucursal, direccion));
+                            envios.put(idEvento, new Envio(retiraPorSucursal, direccion,nombre,apellido,id));
                         }else{
                             reservas.put(idEvento, nroButaca);
                         }
@@ -217,17 +388,17 @@ public class Autenticador {
                                                                         //ya que romperia el sofisticado sistema csv
         if(tipoUsuario == 2){
             if(id.length() != 11){return 5;}
-            if(!organizadores.containsKey(id)){
+            if(organizadores.containsKey(id)){
                 return 2;
             }
             organizadores.put(id, new Organizador(nombre,apellido,id,contrasenia));
-            return 1;
+            return 6;
         }else if(tipoUsuario == 1){
             if(id.length() != 8){return 5;}
-            if(!compradores.containsKey(id)){
+            if(compradores.containsKey(id)){
                 return 2;
             }
-            compradores.put(nombre,new Comprador(nombre,apellido,id,contrasenia,"N/A",LocalDate.EPOCH,new ArrayList<>(),
+            compradores.put(id,new Comprador(nombre,apellido,id,contrasenia,"N/A",LocalDate.EPOCH,new ArrayList<>(),
                     new HashMap<>(),new HashMap<>(),new HashMap<>()));
             return 1;
         }

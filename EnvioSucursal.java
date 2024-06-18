@@ -4,8 +4,8 @@ import java.util.ArrayList;
 public class EnvioSucursal extends Envio {
     private ArrayList<String> puntosDeVenta;
 
-    public EnvioSucursal(String nombre, String apellido, String dni) {
-        super(nombre, apellido, dni);
+    public EnvioSucursal(String nombre, String apellido,String direccion,String dni) {
+        super(true,direccion,nombre, apellido, dni);
         // Inicializamos la lista de puntos de venta
         this.puntosDeVenta = new ArrayList<>();
         // Agregamos algunos puntos de venta de ejemplo
@@ -16,7 +16,7 @@ public class EnvioSucursal extends Envio {
 
     @Override
     public double gastoEnvio() {
-        return 0; // Retiro en punto de venta es gratuito
+        return 0.0; // Retiro en punto de venta es gratuito
     }
 
     public void listarOpciones() {

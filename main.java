@@ -28,7 +28,7 @@ public class main {
         eventos = catalogo.retornarEventos();
     }
 
-    private static void confirmarCompra(String idUsuario, Evento e, ArrayList<Integer> butacas){
+    private static void confirmarCompra(String idUsuario, Evento e, ArrayList<Integer> butacas, String nombre, String apellido, String dni){
         print(e.getNombre()+" butacas: "+butacas.toString());
         print(" TOTAL entradas $$$ = "+butacas.size()*e.getPrecio());
         print(" ¿Quiere [r]etirar sus entradas o un [e]nvio a domicilio? ");
@@ -38,7 +38,7 @@ public class main {
         if(opcion.equals("r")){
             print(" Indique su codigo postal, la terminal de retiro mas cercana a ud será enviada por email"); //es mentira!!! todo mockup
             envio = s.nextLine();
-            Envio env = new Envio(true,envio);
+            Envio env = new Envio(true,envio,nombre,apellido,dni);
             for(Integer i : butacas){
                 e.getButacasOcupadas().put(i,idUsuario);
                 Autenticador.getCompradores().get(idUsuario).addCompra(e.getId(),i);
@@ -47,7 +47,7 @@ public class main {
         }else if(opcion.equals("e")){
             print(" Indique su dirección en formato Cod.postal-Calle-Nro-Piso-Dpto");
             envio = s.nextLine();
-            Envio env = new Envio(false,envio);
+            Envio env = new Envio(false,envio,nombre,apellido,dni);
             print(" Costo de envio $$$ se cobrará cuando llegue el paquete."); //ver como calcular esto, dice que se usa un sistema del correo en el enunciado (?? supongo se podrá inventar cualq numero para la demo
             for(Integer i : butacas){
                 e.getButacasOcupadas().put(i,idUsuario);
@@ -59,7 +59,7 @@ public class main {
         }
     }
 
-    private static void countDownReserva(String idUsuario, Evento e, ArrayList<Integer> butacas){
+    private static void countDownReserva(String idUsuario, Evento e, ArrayList<Integer> butacas, String nombre, String apellido, String dni){
         //ver como hacer la barrita que se vaya llenando, por ahora no vencen las reservas
         print(" Reservando para "+e.getNombre());
         print(" Ingrese número de tarjeta de credito: ");
@@ -74,11 +74,11 @@ public class main {
         print(" Ingrese [c] para cancelar la reserva [s] para confirmar el pago");
         String opcion = s.nextLine();
         if(opcion.equals("s")){
-            confirmarCompra(idUsuario, e, butacas);
+            confirmarCompra(idUsuario, e, butacas, nombre, apellido, dni);
         }
     }
 
-    private static void pantallaReservar(String idUsuario, Evento e){
+    private static void pantallaReservar(String idUsuario, Evento e, String nombre, String apellido, String dni){
         print(" Asientos disponibles en "+e.getNombre()+" para "+e.getFechas().getFirst());
         //TODO: verificar que si no hay lugares se imprima antes un aviso que esta full
         for(int i = 0; i < e.getCapacidad(); i++){
@@ -99,7 +99,7 @@ public class main {
                 print(" Ingrese numero de butaca para su entrada n "+i+1);
                 butacasReservadas.add(Integer.parseInt(s.nextLine()));
             }
-            countDownReserva(idUsuario, e, butacasReservadas);
+            countDownReserva(idUsuario, e, butacasReservadas, nombre, apellido, dni);
         }
     };
 
@@ -159,7 +159,7 @@ public class main {
             print(" Tenés que completar tus datos personales: ");
             print(" Ingresá tu email: ");
             String email = s.nextLine();
-            Autenticador.getCompradores().getOrDefault(id,null).setEmail(email);
+            Autenticador.getCompradores().get(id).setEmail(email);
             print(" Ingresá tu fecha de nacimiento en formato <aaaa>-<mm>-<dd> :");
             print(" Ej: 1 de marzo de 2002 = 2002-03-01");
             LocalDate nacimiento = LocalDate.parse(s.nextLine());
@@ -199,7 +199,8 @@ public class main {
             if(opcion.equals("d")){
                 modificarDatosPersonales(id);
             }else{
-                pantallaReservar(id, eventos.get(opcion));
+                pantallaReservar(id, eventos.get(opcion), Autenticador.getCompradores().getOrDefault(id, null).getNombre(), Autenticador.getCompradores().getOrDefault(id, null).getApellido(),Autenticador.getCompradores().getOrDefault(id, null).getId());
+
             }
 
 
@@ -283,7 +284,11 @@ public class main {
                 if(status == 1){
                     System.out.println(" Registro exitoso ");
                     pantallaCompradorInicioSesion(id, true);
-                }else if(status == 2){
+                }else if (status == 6){
+                    System.out.println(" Registro exitoso ");
+                    pantallaOrganizadorInicioSesion();
+                }
+                else if(status == 2){
                     System.out.println(" El usuario con dicho ID ya existe, por favor inicie sesion ");
                     String seleccion = s.nextLine();
                     System.out.println(" Ingrese cualquier caracter para volver atrás ");

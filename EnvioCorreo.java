@@ -1,8 +1,7 @@
 public class EnvioCorreo extends Envio {
     private String codigoPostal;
-
-    public EnvioCorreo(String nombre, String apellido, String dni, String codigoPostal) {
-        super(nombre, apellido, dni);
+    public EnvioCorreo(String nombre,String direccion, String apellido, String codigoPostal,String dni) {
+        super(false,direccion,nombre,apellido,dni);
         this.codigoPostal = codigoPostal;
     }
 
@@ -13,7 +12,6 @@ public class EnvioCorreo extends Envio {
     public void setCodigoPostal(String codigoPostal) {
         this.codigoPostal = codigoPostal;
     }
-
 
     @Override
     public double gastoEnvio() {
