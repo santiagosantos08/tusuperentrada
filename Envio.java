@@ -1,37 +1,25 @@
-public abstract class Envio {
-    protected String nombre;
-    protected String apellido;
-    protected String DNI;
+public class Envio {
+    private boolean retiraPorSucursal; //si es false ya se que es a domicilio
+    private String direccion; //ya sea de envio o de retiro
 
-    public Envio(String nombre, String apellido, String  DNI) {
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.DNI = DNI;
+    Envio(boolean retira, String direccion){
+        this.retiraPorSucursal = retira;
+        this.direccion = direccion;
     }
 
-    public String getNombre() {
-        return nombre;
+    public boolean isRetiraPorSucursal() {
+        return retiraPorSucursal;
     }
 
-    public String getApellido() {
-        return apellido;
+    public void setRetiraPorSucursal(boolean retiraPorSucursal) {
+        this.retiraPorSucursal = retiraPorSucursal;
     }
 
-    public String getDNI() {
-        return DNI;
+    public String getDireccion() {
+        return direccion;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public void setDNI(String DNI) {
-        this.DNI = DNI;
-    }
-
-    public abstract double gastoEnvio();
 }

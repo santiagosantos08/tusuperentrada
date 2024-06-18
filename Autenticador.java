@@ -1,52 +1,110 @@
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 
-//Criterios de Aceptacion:
-//
-//    LISTO: Verificar que pueda ingresar los datos de manera clara y facil.
-//
-//    Corroborar que ingrese la informacion necesaria: nombre, apellido, contraseña, nro documento, fecha de nacimiento, email y tipos de eventos que le interesan.
-//
-//    Permitir que pueda acceder a actualizar sus datos e intereses en distintos tipos de eventos de forma entendible.
-
 public class Autenticador {
-    // Estructura del CSV:
-    // ID[DNI o CUIT/CUIL], nombre, apellido, tipoUsuario[1= Comprador, 2= Organizador], contraseña
-    // En el organizador falta pedir datos de AFIP y etc pero no se entrega este sprinmt, lo deje ahi como para adelantar
-    // ya que la mayoria del codigo se podia compartir con el comprador. Dsp una vez que se registre se pediran las otras preferencias.
-    // desde afuera ya sabemos que tipo de usuario es x la long del Id, se puede ammpliar esto sin modificar
 
-    //creo que tambien va a hacer falta agregar algun metodo para recuperar los datos de algun Id dado, ya que desde afuera la registrar si los tenemos pero al iniciar sesion no.
+    // ESTRUCTURA DEL ARCHIVO:
+    // [0] = 1 Comprador, = 2 Organizador
+    // [1] Nombre
+    // [2] Apellido
+    // [3] ID
+    // [4] Contraseña
+    // [5] Cantidad Eventos (ya sea comprados/reservados/organizados)
 
-    private static HashMap<Comprador, String> compradoresLogin = new HashMap<>(); //mapa de cada usuario a su contraseña(super seguro!)
-    private static HashMap<Organizador, String> organizadoresLogin = new HashMap<>();
+    // SOLO si es Comprador
+    // [6] Email
+    // [7] Nacimiento
+    // [8] CantPreferencias
+    // [9..] Lista de preferencias
+    // [...] INTERCALADO x CantidadEventos: ID Evento, nroButaca, true/false=comprada/reservada, si el anterior es true tiene retiro/envio , direccion (ya sea de envio o retiro)
+
+    // SOLO si es Organizador
+    // [6..] id eventos
+    // y despues en otro sprint el que sea organizadr va a tener las preferencias de pago y todo eso.. definir bien a futuro.
+
+    //nota a futuro: jamás hacer esto otra vez, era mas facil levantar un serverSQL y abrir los puertos en el router..
+
+    private static final int CantidadValoresFijosCSVComprador = 9;
+    private static HashMap<String, Comprador> compradores = new HashMap<>();
+    private static HashMap<String, Organizador> organizadores = new HashMap<>();
+
+    public static HashMap<String, Comprador> getCompradores() {
+        return compradores;
+    }
+
+    public static void setCompradores(HashMap<String, Comprador> compradores) {
+        Autenticador.compradores = compradores;
+    }
+
+    public static HashMap<String, Organizador> getOrganizadores() {
+        return organizadores;
+    }
+
+    public static void setOrganizadores(HashMap<String, Organizador> organizadores) {
+        Autenticador.organizadores = organizadores;
+    }
 
     public static boolean guardarDatos(){
         try (FileWriter writer = new FileWriter("user_data.csv",false)){
-            for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
+            for(Map.Entry<String,Comprador> entry : compradores.entrySet()){
                 Comprador comprador;
-                comprador = entry.getKey();
+                comprador = entry.getValue();
+                int eventosRelacionados = comprador.getCompras().size() + comprador.getReservas().size();
                 StringBuilder userLine = new StringBuilder();
-                userLine.append(comprador.getId()).append(",").append(comprador.getNombre())
-                        .append(",").append(comprador.getApellido()).append(",").append("1")
-                        .append(",").append(entry.getValue()).append("\n");
+                userLine.append("1").append(",");
+                userLine.append(comprador.getNombre()).append(",");
+                userLine.append(comprador.getApellido()).append(",");
+                userLine.append(comprador.getId()).append(",");
+                userLine.append(comprador.getContrasenia()).append(",");
+                userLine.append(eventosRelacionados).append(",");
+                userLine.append(comprador.getEmail()).append(",");
+                userLine.append(comprador.getFecha_nacimiento()).append(",");
+                userLine.append(comprador.getPreferencias().size()).append(",");
+                // [...] INTERCALADO x CantidadEventos: ID Evento, nroButaca, true/false=comprada/reservada, si el anterior es true tiene retiro/envio , direccion (ya sea de env
+                for(Map.Entry<Integer, Integer> e1 : comprador.getCompras().entrySet()){
+                    userLine.append(e1.getKey()).append(",");
+                    userLine.append(e1.getValue()).append(",");
+                    userLine.append("true").append(",");
+                    userLine.append(comprador.getEnvios().getOrDefault(e1.getKey(),new Envio(false,"")).isRetiraPorSucursal()).append(",");
+                    //el default ese no deberia pasar NUNCA pero prefiero esto antes que crashee el programa
+                    userLine.append(comprador.getEnvios().getOrDefault(e1.getKey(),new Envio(false,"")).getDireccion()).append(",");
+                }
+                for(Map.Entry<Integer, Integer> e1 : comprador.getReservas().entrySet()){
+                    userLine.append(e1.getKey()).append(",");
+                    userLine.append(e1.getValue()).append(",");
+                    userLine.append("false").append(",");
+                    userLine.append("false").append(",");
+                    userLine.append("N/A").append(",");
+                }
+                userLine.setLength(userLine.length() - 1);
+                userLine.append("\n");
                 String entradaCSV = userLine.toString();
                 writer.write(entradaCSV);
             }
-            for(Map.Entry<Organizador, String> entry : organizadoresLogin.entrySet()){
+            for(Map.Entry<String, Organizador> entry : organizadores.entrySet()){
                 Organizador organizador;
-                organizador = entry.getKey();
+                organizador = entry.getValue();
                 StringBuilder userLine = new StringBuilder();
-                userLine.append(organizador.getId()).append(",").append(organizador.getNombre())
-                        .append(",").append(organizador.getApellido()).append(",").append("2")
-                        .append(",").append(entry.getValue()).append("\n");
-                writer.append(userLine);
+                userLine.append("2").append(",");
+                userLine.append(organizador.getNombre()).append(",");
+                userLine.append(organizador.getApellido()).append(",");
+                userLine.append(organizador.getId()).append(",");
+                userLine.append(organizador.getContrasenia()).append(",");
+                userLine.append(organizador.getEventos().size()).append(",");
+                for(Integer i : organizador.getEventos()){
+                    userLine.append(i).append(",");
+                }
+                userLine.setLength(userLine.length() - 1);
+                userLine.append("\n");
+                String entradaCSV = userLine.toString();
+                writer.write(entradaCSV);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,15 +116,59 @@ public class Autenticador {
         String csvFile = "user_data.csv";
         String line;
         String[] data;
+        // [0] = 1 Comprador, = 2 Organizador
+        // [1] Nombre
+        // [2] Apellido
+        // [3] ID
+        // [4] Contraseña
+        // [5] Cantidad Eventos (ya sea comprados/reservados/organizados)
+        // SOLO si es Comprador
+        // [6] Email
+        // [7] Nacimiento
+        // [8] CantPreferencias
+        // [9..] Lista de preferencias
+        // [...] INTERCALADO x CantidadEventos: ID Evento, nroButaca, true/false=comprada/reservada, si el anterior es true tiene retiroTRUE/envioFALSE , direccion (ya sea de envio o retiro)
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))){
             while ((line = br.readLine()) != null) {
                 data = line.split(",");
-                int tipoUsuario = Integer.parseInt(data[3]); //1 es Comprador, 2 es Organizador
+                int tipoUsuario = Integer.parseInt(data[0]);
+                String nombre = data[1];
+                String apellido = data[2];
+                String id = data[3];
+                String contrasenia = data[4];
+                int cantEventos = Integer.parseInt(data[5]);
+                //1 es Comprador, 2 es Organizador
                 if(tipoUsuario == 2){
-                    organizadoresLogin.put(new Organizador(data[1],data[2],data[0]),data[4]);
+                    organizadores.put(id,new Organizador(nombre,apellido,id,contrasenia));
                 }
                 if(tipoUsuario == 1){
-                    compradoresLogin.put(new Comprador(data[1],data[2],data[0]),data[4]);
+                    String email = data[6];
+                    LocalDate nacimiento = LocalDate.parse(data[7]);
+                    int cantPreferencias = Integer.parseInt(data[8]);
+                    ArrayList<String> preferencias = new ArrayList<>();
+                    HashMap<Integer, Envio> envios = new HashMap<>();
+                    HashMap<Integer, Integer> reservas = new HashMap<>();
+                    HashMap<Integer, Integer> comprasConfirmadas = new HashMap<>();
+                    for(int i = 0; i < cantPreferencias; i++){
+                        preferencias.add(data[CantidadValoresFijosCSVComprador + i]);
+                    }
+                    int i = CantidadValoresFijosCSVComprador + cantPreferencias;
+                    while(i < CantidadValoresFijosCSVComprador + cantPreferencias + (cantEventos * 5)){
+                        int idEvento = Integer.parseInt(data[i]);
+                        int nroButaca = Integer.parseInt(data[i+1]);
+                        boolean compraConfirmada = Boolean.parseBoolean(data[i+2]);
+                        //despues al guardar acordarme que si no esta confirmada igual hay que tirar 2 valores para no desalinear todo el archivo
+                        boolean retiraPorSucursal = Boolean.parseBoolean(data[i+3]);
+                        String direccion = data[i+4];
+                        if(compraConfirmada){
+                            comprasConfirmadas.put(idEvento,nroButaca);
+                            envios.put(idEvento, new Envio(retiraPorSucursal, direccion));
+                        }else{
+                            reservas.put(idEvento, nroButaca);
+                        }
+                        i = i+5;
+                    }
+                    compradores.put(id, new Comprador(nombre,apellido,id,contrasenia,email,nacimiento,preferencias,envios,comprasConfirmadas,reservas));
                 }
             }
         } catch (IOException e) {
@@ -84,41 +186,27 @@ public class Autenticador {
         if(id.length() != 11 && id.length() != 8){
             return 4; //el id no es ni dni ni cuit/cuil
         }else if(id.length() == 11){ //organizador
-            for(Map.Entry<Organizador, String> entry : organizadoresLogin.entrySet()){
-                Organizador c = entry.getKey();
-                if (c.getId().equals(id)) {
-                    if(contrasenia.equals(entry.getValue())){
-                        return 2;
-                    }
-                    return 3;
-                }
+            Organizador o = organizadores.getOrDefault(id,null);
+            if (o == null){
+                return 5;
             }
-            return 5;
+            if (o.getContrasenia().equals(contrasenia)){
+                return 2;
+            }
+            return 3;
         }else if(id.length() == 8){ //comprador
-            for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
-                Comprador c = entry.getKey();
-                if (c.getId().equals(id)){
-                    if(contrasenia.equals(entry.getValue())){
-                        return 1;
-                    }
-                    return 3;
-                }
+            Comprador c = compradores.getOrDefault(id,null);
+            if (c == null){
+                return 5;
             }
-            return 5;
+            if (c.getContrasenia().equals(contrasenia)){
+                return 1;
+            }
+            return 3;
         }
         return 3; //en realidad no hace falta pero es para no dejar sin return default, es el mas generico.
     };
-    public static boolean setDatosExtraComprador(String id, String email, Date fechaNacimiento, List<String> preferencias){
-        for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
-            Comprador c = entry.getKey();
-            if (c.getId().equals(id)){
-                c.setEmail(email);
-                c.setNacimiento(fechaNacimiento);
-                c.setPreferencias(preferencias);
-            }
-        }
-    }
-    //public static Comprador get
+
     public static int registroExitoso(String nombre, String apellido, String id, int tipoUsuario, String contrasenia){
         // return 1 registro existoso
         // return 2 ya existe el usuario
@@ -129,26 +217,18 @@ public class Autenticador {
                                                                         //ya que romperia el sofisticado sistema csv
         if(tipoUsuario == 2){
             if(id.length() != 11){return 5;}
-            Organizador nuevoOrg = new Organizador(nombre, apellido, id);
-            // aca se podria mejorar pero no se si el containsKey usa el equals que le redefini o no.. asi es mas lento pero anda seguro
-            for(Map.Entry<Organizador, String> entry : organizadoresLogin.entrySet()){
-                Organizador c = entry.getKey();
-                if (c.equals(nuevoOrg)) {
-                    return 2;
-                }
+            if(!organizadores.containsKey(id)){
+                return 2;
             }
-            organizadoresLogin.put(nuevoOrg, contrasenia);
+            organizadores.put(id, new Organizador(nombre,apellido,id,contrasenia));
             return 1;
         }else if(tipoUsuario == 1){
             if(id.length() != 8){return 5;}
-            Comprador nuevoComprador = new Comprador(nombre, apellido, id);
-            for(Map.Entry<Comprador, String> entry : compradoresLogin.entrySet()){
-                Comprador c = entry.getKey();
-                if (c.equals(nuevoComprador)){
-                    return 2;
-                }
+            if(!compradores.containsKey(id)){
+                return 2;
             }
-            compradoresLogin.put(nuevoComprador, contrasenia);
+            compradores.put(nombre,new Comprador(nombre,apellido,id,contrasenia,"N/A",LocalDate.EPOCH,new ArrayList<>(),
+                    new HashMap<>(),new HashMap<>(),new HashMap<>()));
             return 1;
         }
         return 4; // se le pasó un tipoUsuario que no existe a la funcion

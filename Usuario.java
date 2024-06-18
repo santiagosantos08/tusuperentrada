@@ -1,12 +1,22 @@
 public class Usuario {
-    protected String nombre;
-    protected String apellido;
-    protected String id; //en caso del Comprador va a ser DNI, en Org va a ser CUIT/CUIL
+    private String nombre;
+    private String apellido;
+    private String id; //en caso del Comprador va a ser DNI, en Org va a ser CUIT/CUIL
+    private String contrasenia;
 
-    Usuario(String nombre, String apellido, String id) {
+    Usuario(String nombre, String apellido, String id, String contrasenia) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.id = id;
+        this.contrasenia = contrasenia;
+    }
+
+    public String getContrasenia() { //nivel maximo de crotera alcanzado
+        return contrasenia;
+    }
+
+    public void setContrasenia(String contrasenia) {
+        this.contrasenia = contrasenia;
     }
 
     public String getId() {
@@ -38,5 +48,7 @@ public class Usuario {
         if (!(o instanceof Usuario)) {return false;}
         Usuario u = (Usuario) o;
         return ((this.getApellido().equals(u.getApellido()))&&(this.getNombre().equals(u.getNombre()))&&(this.getId().equals(u.getId())));
+        //deberia comparar la contraseña tambien pero no tengo ganas de cambiar todos los llamados que tiene este metodo..
+        //si hay 2 DNI iguales es problema del RENAPER no de la app esta
     }
 }
