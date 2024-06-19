@@ -1,11 +1,11 @@
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.time.*;
-// demo de app
+
 public class main {
-    //...
     static ArrayList<Evento> eventos = new ArrayList<>();
     static ArrayList<Comprador> compradores = new ArrayList<>();
+
     public static void pantallaCompradorInicioSesion(Comprador comprador) {
         System.out.println("Ingrese la opcion que desea realizar");
         System.out.println("1) Ver Eventos");
@@ -23,8 +23,15 @@ public class main {
                 System.out.println("Por favor, ingrese un número válido para el evento:");
                 s.next();
             }
-            int e = s.nextInt();
+            int e = s.nextInt() - 1; // Resta 1 al índice ingresado por el usuario
             s.nextLine();
+
+            // Verifica que el índice esté dentro del rango válido
+            while (e < 0 || e >= eventos.size()) {
+                System.out.println("Número de evento inválido. Por favor, ingrese un número válido para el evento:");
+                e = s.nextInt() - 1; // Resta 1 al índice ingresado por el usuario
+                s.nextLine();
+            }
 
             System.out.println("Ingrese el numero de asiento");
             while (!s.hasNextInt()) {
@@ -33,15 +40,29 @@ public class main {
             }
             int asiento = s.nextInt();
             s.nextLine();
-            if(comprador.reservarEvento(eventos.get(e), asiento))
+
+            if (comprador.reservarEvento(eventos.get(e), asiento)) {
                 System.out.println("Reservado");
-            else
+                System.out.println("¿Quiere abonar con tarjeta (1) o efectivo (2)?");
+                String metodoPago = s.nextLine();
+
+                if (metodoPago.equals("1")) {
+                    System.out.println("Ingrese el número de su tarjeta:");
+                    String numeroTarjeta = s.nextLine();
+                    System.out.println("Pago realizado con tarjeta número: " + numeroTarjeta);
+                } else if (metodoPago.equals("2")) {
+                    System.out.println("Pago realizado en efectivo.");
+                } else {
+                    System.out.println("Método de pago no válido.");
+                }
+            } else {
                 System.out.println("No se pudo reservar tu evento");
+            }
         }
     }
 
     public static void leerDatosEventos(ArrayList<Evento> eventos) {
-            int i = 1;
+        int i = 1;
         for (Evento evento : eventos) {
             System.out.println("Evento " + i);
             System.out.println("Nombre: " + evento.getNombre());
@@ -60,6 +81,7 @@ public class main {
         System.out.println(" Pantalla de ejemplo organizador que ya inició sesión \n");
         System.out.println(" ej actividades de organizador: editar eventos etc; no es para este sprint \n");
     }
+
     public static void main(String[] args){
         Scanner s = new Scanner(System.in);
         boolean run = true;
@@ -74,8 +96,8 @@ public class main {
         eventos.add(event3);
         eventos.add(event4);
         eventos.add(event5);
-        while(run){
 
+        while(run){
             System.out.println(" Pantalla de Inicio de ejemplo sin iniciar sesión, acá se mostrarian solos los detalles principales de los eventos \n");
             leerDatosEventos(eventos);
             System.out.println(" Presione 1 para inciar sesion \n");

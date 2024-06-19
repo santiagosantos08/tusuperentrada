@@ -1,5 +1,6 @@
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Comprador extends Usuario{
     //..
@@ -8,7 +9,10 @@ public class Comprador extends Usuario{
     private List<String> preferencias;
     private List<Evento> eventos;
     Comprador(String nombre, String apellido, String Id){
+
         super(nombre, apellido, Id);
+        this.preferencias = new ArrayList<>(); // Inicializar la lista de preferencias
+        this.eventos = new ArrayList<>(); // Inicializar la lista de eventos
     }
 
     public String getEmail() {
