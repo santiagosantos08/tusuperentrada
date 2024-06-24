@@ -1,44 +1,82 @@
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
 
 public class Comprador extends Usuario{
-    //..
     private String email;
-    private Date nacimiento;
-    private List<String> preferencias;
-    private List<Evento> eventos;
-    Comprador(String nombre, String apellido, String Id){
+    private LocalDate fecha_nacimiento;
+    private ArrayList<String> preferencias;
+    private HashMap<Integer, Envio> envios; //de ID evento -> Envio
+    private HashMap<Integer, Integer> compras; // de ID evento -> nro butaca
+    private HashMap<Integer, Integer> reservas; // eventos que tiene reservados pero no comprados -> nro butaca reservada
 
-        super(nombre, apellido, Id);
-        this.preferencias = new ArrayList<>(); // Inicializar la lista de preferencias
-        this.eventos = new ArrayList<>(); // Inicializar la lista de eventos
+    Comprador(String nombre, String apellido, String Id, String contrasenia, String email, LocalDate nacimiento, ArrayList<String> preferencias,
+              HashMap<Integer, Envio> envios,HashMap<Integer,Integer> compras, HashMap<Integer,Integer> reservas){
+        super(nombre, apellido, Id, contrasenia);
+        this.preferencias = preferencias;
+        this.email = email;
+        this.fecha_nacimiento = nacimiento;
+        this.envios = envios;
+        this.compras = compras;
+        this.reservas = reservas;
     }
 
     public String getEmail() {
         return email;
     }
+
+    public void addEnvio(Integer idEvento, Envio e){
+        envios.put(idEvento,e);
+    }
+
+    public void addCompra(Integer idEvento, Integer nroButaca){
+        this.compras.put(idEvento, nroButaca);
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
-    public Date getNacimiento() {
-        return nacimiento;
+
+    public LocalDate getFecha_nacimiento() {
+        return fecha_nacimiento;
     }
-    public void setNacimiento(Date nacimiento) {
-        this.nacimiento = nacimiento;
+
+    public void setFecha_nacimiento(LocalDate fecha_nacimiento) {
+        this.fecha_nacimiento = fecha_nacimiento;
     }
-    public List<String> getPreferencias() {
+
+    public ArrayList<String> getPreferencias() {
         return preferencias;
     }
-    public void setPreferencias(List<String> preferencias) {
+
+    public void setPreferencias(ArrayList<String> preferencias) {
         this.preferencias = preferencias;
     }
-    public boolean reservarEvento(Evento e, int nro_asiento) {
-        if(e.asientoDisponible(nro_asiento)) { //Si el asiento esta disponible se reserva
-            e.seleccionarAsiento(nro_asiento);
-            this.eventos.add(e);
-            return true;
-        }
-        return false;
+
+    public HashMap<Integer, Envio> getEnvios() {
+        return envios;
     }
+
+    public void setEnvios(HashMap<Integer, Envio> envios) {
+        this.envios = envios;
+    }
+
+    public HashMap<Integer, Integer> getCompras() {
+        return compras;
+    }
+
+    public void setCompras(HashMap<Integer, Integer> compras) {
+        this.compras = compras;
+    }
+
+    public HashMap<Integer, Integer> getReservas() {
+        return reservas;
+    }
+
+    public void setReservas(HashMap<Integer, Integer> reservas) {
+        this.reservas = reservas;
+    }
+//set eventos
 }
