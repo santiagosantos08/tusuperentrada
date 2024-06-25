@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,9 +12,10 @@ public class Comprador extends Usuario{
     private HashMap<Integer, Envio> envios; //de ID evento -> Envio
     private HashMap<Integer, Integer> compras; // de ID evento -> nro butaca
     private HashMap<Integer, Integer> reservas; // eventos que tiene reservados pero no comprados -> nro butaca reservada
+    private ArrayList<MetodoPago> metodosPago;
 
     Comprador(String nombre, String apellido, String Id, String contrasenia, String email, LocalDate nacimiento, ArrayList<String> preferencias,
-              HashMap<Integer, Envio> envios,HashMap<Integer,Integer> compras, HashMap<Integer,Integer> reservas){
+              HashMap<Integer, Envio> envios,HashMap<Integer,Integer> compras, HashMap<Integer,Integer> reservas, ArrayList<MetodoPago> metodosPago){
         super(nombre, apellido, Id, contrasenia);
         this.preferencias = preferencias;
         this.email = email;
@@ -21,6 +23,7 @@ public class Comprador extends Usuario{
         this.envios = envios;
         this.compras = compras;
         this.reservas = reservas;
+        this.metodosPago = metodosPago;
     }
 
     public String getEmail() {
@@ -78,5 +81,14 @@ public class Comprador extends Usuario{
     public void setReservas(HashMap<Integer, Integer> reservas) {
         this.reservas = reservas;
     }
-//set eventos
+
+    public ArrayList<MetodoPago> getMetodosPago() {
+        return metodosPago;
+    }
+
+    public void setMetodosPago(ArrayList<MetodoPago> metodosPago) {
+        this.metodosPago = metodosPago;
+    }
+
+    //set eventos
 }
