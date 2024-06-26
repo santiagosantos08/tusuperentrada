@@ -159,7 +159,7 @@ public class main {
             print(" Tenés que completar tus datos personales: ");
             print(" Ingresá tu email: ");
             String email = s.nextLine();
-            Autenticador.getCompradores().getOrDefault(id,null).setEmail(email);
+            Autenticador.getCompradores().get(id).setEmail(email);
             print(" Ingresá tu fecha de nacimiento en formato <aaaa>-<mm>-<dd> :");
             print(" Ej: 1 de marzo de 2002 = 2002-03-01");
             LocalDate nacimiento = LocalDate.parse(s.nextLine());

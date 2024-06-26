@@ -45,6 +45,7 @@ public class Autenticador {
         Autenticador.compradores = compradores;
     }
 
+
     public static HashMap<String, Organizador> getOrganizadores() {
         return organizadores;
     }
@@ -258,7 +259,7 @@ public class Autenticador {
             if(compradores.containsKey(id)){
                 return 2;
             }
-            compradores.put(nombre,new Comprador(nombre,apellido,id,contrasenia,"N/A",LocalDate.EPOCH,new ArrayList<>(),
+            compradores.put(id,new Comprador(nombre,apellido,id,contrasenia,"N/A",LocalDate.EPOCH,new ArrayList<>(),
                     new HashMap<>(),new HashMap<>(),new HashMap<>(),new ArrayList<MetodoPago>()));
             return 1;
         }
