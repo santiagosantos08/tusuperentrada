@@ -248,14 +248,14 @@ public class Autenticador {
                                                                         //ya que romperia el sofisticado sistema csv
         if(tipoUsuario == 2){
             if(id.length() != 11){return 5;}
-            if(!organizadores.containsKey(id)){
+            if(organizadores.containsKey(id)){
                 return 2;
             }
             organizadores.put(id, new Organizador(nombre,apellido,id,contrasenia));
             return 1;
         }else if(tipoUsuario == 1){
             if(id.length() != 8){return 5;}
-            if(!compradores.containsKey(id)){
+            if(compradores.containsKey(id)){
                 return 2;
             }
             compradores.put(nombre,new Comprador(nombre,apellido,id,contrasenia,"N/A",LocalDate.EPOCH,new ArrayList<>(),
