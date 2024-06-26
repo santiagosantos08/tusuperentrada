@@ -14,6 +14,7 @@ public class Tarjeta extends MetodoPago{
         this.mesVto = mesVto;
         this.anioVto = anioVto;
         this.porcentajeDescuento = randPorc(5,20);
+        this.descripcion = "  ";
     }
 
     public String getNumeroTarjeta() {
