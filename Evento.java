@@ -1,19 +1,19 @@
 
 import java.time.LocalDate;
-
+import java.util.Random;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
 public class Evento {
-    private int capacidad, id, precio;
+    private int capacidad, id;
     private String nombre, ubicacion,descripcion, imagen_url, tipo_evento; //las fotos tiene que ser muchas!!!!!!!!!!!!! en otra entrega será
                                                                             //o de ultima para safar que sean links a google fotos y veo que si no esta logueado le
                                                                             //cambio acá algun argumento al link para que solo muestre algunas NO SE
     private ArrayList<LocalDate> fechas;
     private HashMap<Integer, String> butacasOcupadas; //mapa de nroButaca -> Id comprador que la tiene.
     private String org_id;
-
+    private double precio;
     public Evento(int capacidad, String nombre, String ubicacion, String descripcion, String imagen_url,
                   String tipo_evento, ArrayList<LocalDate> fechas, int id, String org_id, HashMap<Integer,String> asientos) {
         //chequear que ninguno de los String tenga comas!!!!!!
@@ -35,12 +35,18 @@ public class Evento {
         }
         this.id = id;
         this.org_id = org_id;
+        this.setPrecio();
     }
 
-    public int getPrecio(){
-        return this.precio;
+    public double getPrecio(){
+        int retorno = (int) this.precio;
+        return retorno;
     }
-
+    private void setPrecio() {
+        double min = 100.0;
+        double max = 200000.0;
+        this.precio = min + (max - min) * Math.random();
+    }
     public String getOrg_id(){
         return org_id;
     }

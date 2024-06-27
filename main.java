@@ -85,14 +85,38 @@ public class main {
     private static void countDownReserva(String idUsuario, Evento e, ArrayList<Integer> butacas){
         //ver como hacer la barrita que se vaya llenando, por ahora no vencen las reservas
         print(" Reservando para "+e.getNombre());
-        print(" Ingrese número de tarjeta de credito: ");
-        String nroTarjeta = s.nextLine();
-        print(" Ingrese mes vto de la tarjeta: ");
-        String mVto = s.nextLine();
-        print(" Ingrese año vto de la tarjeta: ");
-        String aVto = s.nextLine();
-        print(" Ingrese codigo de seguridad de la tarjeta: ");
-        String ccv = s.nextLine();
+        Comprador c = Autenticador.getCompradores().get(idUsuario);
+        ArrayList<MetodoPago> aux = c.getMetodosPago();
+        if (aux.size() > 0) {
+            print("Usted ya posee metodos de pago, si desea seleccionar alguno de ellos ingrese[s]." +
+                    " Si desea agregar un metodo nuevo ingrese cualquier otra tecla");
+            String aux1 = s.nextLine();
+            if(aux1.toLowerCase().equals("s")){
+                print("Ingrese la opcion correspondiente");
+                for (int i = 0; i<aux.size(); i++){
+                    Tarjeta tarjeta = (Tarjeta) aux.get(i);
+                    print("Opcion " + (i+1) + "numero de tarjeta: " + tarjeta.getNumeroTarjeta());
+                }
+                int opcion = Integer.parseInt(s.nextLine());
+                while(opcion < 1 || opcion > aux.size()) {
+                    print("ingrese una opcion valida");
+                    opcion = Integer.parseInt(s.nextLine());
+                }
+            }
+        }
+        else {
+            print("usted no posee metodos de pago debera ingresar uno");
+            print(" Ingrese número de tarjeta de credito: ");
+            String nroTarjeta = s.nextLine();
+            print(" Ingrese mes vto de la tarjeta: ");
+            int mVto = Integer.parseInt(s.nextLine());
+            print(" Ingrese año vto de la tarjeta: ");
+            int aVto = Integer.parseInt(s.nextLine());
+            print(" Ingrese codigo de seguridad de la tarjeta: ");
+            int ccv = Integer.parseInt(s.nextLine());
+            Tarjeta tar = new Tarjeta(nroTarjeta, ccv, mVto, aVto);
+            c.agregarMetodosPago(tar);
+        }
         // hacer validacion, por ahora pasa todo je
         print(" Ingrese [c] para cancelar la reserva [s] para confirmar el pago");
         String opcion = s.nextLine();
@@ -118,8 +142,8 @@ public class main {
             print(" Volviendo al menu principal");
         }else{
             ArrayList<Integer> butacasReservadas = new ArrayList<>();
-            for(int i = 0; i < Integer.parseInt(cantidad); i++){
-                print(" Ingrese numero de butaca para su entrada n "+i+1);
+            for(int i = 1; i <= Integer.parseInt(cantidad); i++){
+                print(" Ingrese numero de butaca para su entrada numero "+i);
                 butacasReservadas.add(Integer.parseInt(s.nextLine()));
             }
             countDownReserva(idUsuario, e, butacasReservadas);
