@@ -32,14 +32,14 @@ public class main {
         fechas.add(LocalDate.parse("2024-07-03"));
         fechas.add(LocalDate.parse("2024-07-04"));
 
-        Evento evento1 = new Evento(500,"Ej1","Estadio Monumental","Ejemplo1Desc","Linkejemplo","Musica en vivo",fechas,1,"2376",new HashMap<Integer,String>());
-        Evento evento2 = new Evento(500,"Ej2","Estadio Monumental","Ejemplo2Desc","Linkejemplo","Musica en vivo",fechas,2,"2376",new HashMap<Integer,String>());
-        Evento evento3 = new Evento(500,"Ej3","Estadio Monumental","Ejemplo3Desc","Linkejemplo","Musica en vivo",fechas,3,"2376",new HashMap<Integer,String>());
-        Evento evento4 = new Evento(500,"Ej4","Estadio Monumental","Ejemplo4Desc","Linkejemplo","Musica en vivo",fechas,4,"2376",new HashMap<Integer,String>());
-        Evento evento5 = new Evento(500,"Ej5","Estadio Monumental","Ejemplo5Desc","Linkejemplo","Musica en vivo",fechas,5,"2376",new HashMap<Integer,String>());
-        Evento evento6 = new Evento(500,"Ej6","Estadio Monumental","Ejemplo6Desc","Linkejemplo","Musica en vivo",fechas,6,"2376",new HashMap<Integer,String>());
-        Evento evento7 = new Evento(500,"Ej7","Estadio Monumental","Ejemplo7Desc","Linkejemplo","Musica en vivo",fechas,7,"2376",new HashMap<Integer,String>());
-        Evento evento8 = new Evento(500,"Ej8","Estadio Monumental","Ejemplo8Desc","Linkejemplo","Musica en vivo",fechas,8,"2376",new HashMap<Integer,String>());
+        Evento evento1 = new Evento(25,"Ej1","Estadio Monumental","Ejemplo1Desc","Linkejemplo","Musica en vivo",fechas,1,"2376",new HashMap<Integer,String>());
+        Evento evento2 = new Evento(20,"Ej2","Estadio Monumental","Ejemplo2Desc","Linkejemplo","Musica en vivo",fechas,2,"2376",new HashMap<Integer,String>());
+        Evento evento3 = new Evento(15,"Ej3","Estadio Monumental","Ejemplo3Desc","Linkejemplo","Musica en vivo",fechas,3,"2376",new HashMap<Integer,String>());
+        Evento evento4 = new Evento(28,"Ej4","Estadio Monumental","Ejemplo4Desc","Linkejemplo","Musica en vivo",fechas,4,"2376",new HashMap<Integer,String>());
+        Evento evento5 = new Evento(14,"Ej5","Estadio Monumental","Ejemplo5Desc","Linkejemplo","Musica en vivo",fechas,5,"2376",new HashMap<Integer,String>());
+        Evento evento6 = new Evento(17,"Ej6","Estadio Monumental","Ejemplo6Desc","Linkejemplo","Musica en vivo",fechas,6,"2376",new HashMap<Integer,String>());
+        Evento evento7 = new Evento(23,"Ej7","Estadio Monumental","Ejemplo7Desc","Linkejemplo","Musica en vivo",fechas,7,"2376",new HashMap<Integer,String>());
+        Evento evento8 = new Evento(18,"Ej8","Estadio Monumental","Ejemplo8Desc","Linkejemplo","Musica en vivo",fechas,8,"2376",new HashMap<Integer,String>());
         eventos.put(evento1.getId(),evento1);
         eventos.put(evento2.getId(),evento2);
         eventos.put(evento3.getId(),evento3);
@@ -107,7 +107,7 @@ public class main {
         for(int i = 0; i < e.getCapacidad(); i++){
             if(i % 15 == 0){print("");}
             if(!e.getButacasOcupadas().containsKey(i)){
-                System.out.print(i);
+                System.out.print("["+i+"]");
             }
         }
         print(" Ingrese cantidad de entradas que quiere comprar. "); //TODO: verificar que no sea mayor a la cantidad disponible..
