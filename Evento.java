@@ -4,6 +4,7 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Set;
 
 public class Evento {
     private int capacidad, id;
@@ -13,13 +14,13 @@ public class Evento {
     private String org_id;
     private double precio;
     public Evento(int capacidad, String nombre, String ubicacion, String descripcion, String imagen_url,
-                  String tipo_evento, ArrayList<LocalDate> fechas, int id, String org_id, HashMap<Integer,String> asientos) {
+                  String tipo_evento, int id, String org_id) {
         //chequear que ninguno de los String tenga comas!!!!!!
         this.capacidad = capacidad;
         this.nombre = nombre;
         this.ubicacion = ubicacion;
         this.descripcion = descripcion;
-        this.imagen_url = c;
+        this.imagen_url = imagen_url;
         this.tipo_evento = tipo_evento;
         this.fechas = new HashMap<>();
         this.id = id;

@@ -40,7 +40,7 @@ public class CatalogoEventos {
                 String descripcion = data[5];
                 String urlImagen = data[6];
                 String tipoEvento = data[7];
-                int precio = Integer.parseInt(data[8]);
+                Double precio = Double.parseDouble(data[8]);
                 int cantFunciones = Integer.parseInt(data[9]);
                 Evento evento = new Evento(capacidad, nombreEvento, ubicacion, descripcion, urlImagen, tipoEvento, idEvento, idOrganizador);
                 evento.setPrecio(precio);
