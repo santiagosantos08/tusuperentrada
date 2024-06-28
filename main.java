@@ -26,6 +26,29 @@ public class main {
         Autenticador.levantarDatos();
         catalogo.inicializarEventos();
         eventos = catalogo.retornarEventos();
+        ArrayList<LocalDate> fechas = new ArrayList<>();
+        fechas.add(LocalDate.parse("2024-07-01"));
+        fechas.add(LocalDate.parse("2024-07-02"));
+        fechas.add(LocalDate.parse("2024-07-03"));
+        fechas.add(LocalDate.parse("2024-07-04"));
+
+        Evento evento1 = new Evento(500,"Ej1","Estadio Monumental","Ejemplo1Desc","Linkejemplo","Musica en vivo",fechas,1,"2376",new HashMap<Integer,String>());
+        Evento evento2 = new Evento(500,"Ej2","Estadio Monumental","Ejemplo2Desc","Linkejemplo","Musica en vivo",fechas,2,"2376",new HashMap<Integer,String>());
+        Evento evento3 = new Evento(500,"Ej3","Estadio Monumental","Ejemplo3Desc","Linkejemplo","Musica en vivo",fechas,3,"2376",new HashMap<Integer,String>());
+        Evento evento4 = new Evento(500,"Ej4","Estadio Monumental","Ejemplo4Desc","Linkejemplo","Musica en vivo",fechas,4,"2376",new HashMap<Integer,String>());
+        Evento evento5 = new Evento(500,"Ej5","Estadio Monumental","Ejemplo5Desc","Linkejemplo","Musica en vivo",fechas,5,"2376",new HashMap<Integer,String>());
+        Evento evento6 = new Evento(500,"Ej6","Estadio Monumental","Ejemplo6Desc","Linkejemplo","Musica en vivo",fechas,6,"2376",new HashMap<Integer,String>());
+        Evento evento7 = new Evento(500,"Ej7","Estadio Monumental","Ejemplo7Desc","Linkejemplo","Musica en vivo",fechas,7,"2376",new HashMap<Integer,String>());
+        Evento evento8 = new Evento(500,"Ej8","Estadio Monumental","Ejemplo8Desc","Linkejemplo","Musica en vivo",fechas,8,"2376",new HashMap<Integer,String>());
+        eventos.put(evento1.getId(),evento1);
+        eventos.put(evento2.getId(),evento2);
+        eventos.put(evento3.getId(),evento3);
+        eventos.put(evento4.getId(),evento4);
+        eventos.put(evento5.getId(),evento5);
+        eventos.put(evento6.getId(),evento6);
+        eventos.put(evento7.getId(),evento7);
+        eventos.put(evento8.getId(),evento8);
+
     }
 
     private static void confirmarCompra(String idUsuario, Evento e, ArrayList<Integer> butacas){
