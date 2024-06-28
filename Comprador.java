@@ -1,9 +1,6 @@
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
 
 public class Comprador extends Usuario{
     private String email;
@@ -89,6 +86,8 @@ public class Comprador extends Usuario{
     public void setMetodosPago(ArrayList<MetodoPago> metodosPago) {
         this.metodosPago = metodosPago;
     }
-
+    public void agregarMetodosPago(MetodoPago m){
+        this.metodosPago.add(m);
+    }
     //set eventos
 }

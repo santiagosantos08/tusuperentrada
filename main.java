@@ -29,6 +29,29 @@ public class main {
         Autenticador.levantarDatos();
         catalogo.inicializarEventos();
         eventos = catalogo.retornarEventos();
+        ArrayList<LocalDate> fechas = new ArrayList<>();
+        fechas.add(LocalDate.parse("2024-07-01"));
+        fechas.add(LocalDate.parse("2024-07-02"));
+        fechas.add(LocalDate.parse("2024-07-03"));
+        fechas.add(LocalDate.parse("2024-07-04"));
+
+        Evento evento1 = new Evento(25,"Ej1","Estadio Monumental","Ejemplo1Desc","Linkejemplo","Musica en vivo",fechas,1,"2376",new HashMap<Integer,String>());
+        Evento evento2 = new Evento(20,"Ej2","Estadio Monumental","Ejemplo2Desc","Linkejemplo","Musica en vivo",fechas,2,"2376",new HashMap<Integer,String>());
+        Evento evento3 = new Evento(15,"Ej3","Estadio Monumental","Ejemplo3Desc","Linkejemplo","Musica en vivo",fechas,3,"2376",new HashMap<Integer,String>());
+        Evento evento4 = new Evento(28,"Ej4","Estadio Monumental","Ejemplo4Desc","Linkejemplo","Musica en vivo",fechas,4,"2376",new HashMap<Integer,String>());
+        Evento evento5 = new Evento(14,"Ej5","Estadio Monumental","Ejemplo5Desc","Linkejemplo","Musica en vivo",fechas,5,"2376",new HashMap<Integer,String>());
+        Evento evento6 = new Evento(17,"Ej6","Estadio Monumental","Ejemplo6Desc","Linkejemplo","Musica en vivo",fechas,6,"2376",new HashMap<Integer,String>());
+        Evento evento7 = new Evento(23,"Ej7","Estadio Monumental","Ejemplo7Desc","Linkejemplo","Musica en vivo",fechas,7,"2376",new HashMap<Integer,String>());
+        Evento evento8 = new Evento(18,"Ej8","Estadio Monumental","Ejemplo8Desc","Linkejemplo","Musica en vivo",fechas,8,"2376",new HashMap<Integer,String>());
+        eventos.put(evento1.getId(),evento1);
+        eventos.put(evento2.getId(),evento2);
+        eventos.put(evento3.getId(),evento3);
+        eventos.put(evento4.getId(),evento4);
+        eventos.put(evento5.getId(),evento5);
+        eventos.put(evento6.getId(),evento6);
+        eventos.put(evento7.getId(),evento7);
+        eventos.put(evento8.getId(),evento8);
+
     }
 
     private static void confirmarCompra(String idUsuario, LocalDate fecha, Evento e, ArrayList<Integer> butacas){
@@ -73,14 +96,38 @@ public class main {
         int espera = 600; // puesto en 600 segundos (10 minutos)
         t.schedule(cuenta_reserva, espera * 1000);
         System.out.println(" Reservando para "+e.getNombre());
-        System.out.println(" Ingrese número de tarjeta de credito: ");
-        String nroTarjeta = s.nextLine();
-        System.out.println(" Ingrese mes vto de la tarjeta: ");
-        String mVto = s.nextLine();
-        System.out.println(" Ingrese año vto de la tarjeta: ");
-        String aVto = s.nextLine();
-        System.out.println(" Ingrese codigo de seguridad de la tarjeta: ");
-        String ccv = s.nextLine();
+        Comprador c = Autenticador.getCompradores().get(idUsuario);
+        ArrayList<MetodoPago> aux = c.getMetodosPago();
+        if (aux.size() > 0) {
+            print("Usted ya posee metodos de pago, si desea seleccionar alguno de ellos ingrese[s]." +
+                    " Si desea agregar un metodo nuevo ingrese cualquier otra tecla");
+            String aux1 = s.nextLine();
+            if(aux1.toLowerCase().equals("s")){
+                print("Ingrese la opcion correspondiente");
+                for (int i = 0; i<aux.size(); i++){
+                    Tarjeta tarjeta = (Tarjeta) aux.get(i);
+                    print("Opcion " + (i+1) + "numero de tarjeta: " + tarjeta.getNumeroTarjeta());
+                }
+                int opcion = Integer.parseInt(s.nextLine());
+                while(opcion < 1 || opcion > aux.size()) {
+                    print("ingrese una opcion valida");
+                    opcion = Integer.parseInt(s.nextLine());
+                }
+            }
+        }
+        else {
+            print("usted no posee metodos de pago debera ingresar uno");
+            System.out.println(" Ingrese número de tarjeta de credito: ");
+            String nroTarjeta = s.nextLine();
+            System.out.println(" Ingrese mes vto de la tarjeta: ");
+            int mVto = Integer.parseInt(s.nextLine());
+            System.out.println(" Ingrese año vto de la tarjeta: ");
+            int aVto = Integer.parseInt(s.nextLine());
+            System.out.println(" Ingrese codigo de seguridad de la tarjeta: ");
+            int ccv = Integer.parseInt(s.nextLine());
+            Tarjeta tar = new Tarjeta(nroTarjeta, ccv, mVto, aVto);
+            c.agregarMetodosPago(tar);
+        }
         // hacer validacion, por ahora pasa todo je
         System.out.println(" Ingrese [c] para cancelar la reserva [s] para confirmar el pago");
         String opcion = s.nextLine();
@@ -178,7 +225,7 @@ public class main {
             print(" Tenés que completar tus datos personales: ");
             print(" Ingresá tu email: ");
             String email = s.nextLine();
-            Autenticador.getCompradores().getOrDefault(id,null).setEmail(email);
+            Autenticador.getCompradores().get(id).setEmail(email);
             print(" Ingresá tu fecha de nacimiento en formato <aaaa>-<mm>-<dd> :");
             print(" Ej: 1 de marzo de 2002 = 2002-03-01");
             LocalDate nacimiento = LocalDate.parse(s.nextLine());

@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,16 +23,17 @@ public class Autenticador {
     // [6] Email
     // [7] Nacimiento
     // [8] CantPreferencias
-    // [9..] Lista de preferencias
-    // [...] INTERCALADO x CantidadEventos: ID Evento, nroButaca, true/false=comprada/reservada, si el anterior es true tiene retiro/envio , direccion (ya sea de envio o retiro)
-
+    // []
+    // [9] CantTarjetasCredito
+    // [10..] Lista de preferencias
+    // [...] INTERCALADO x CantidadEventos: ID Evento, nroButaca, true/false=comprada/reservada, si el anterior es true tiene retiroTRUE/envioFALSE , direccion (ya sea de envio o retiro)
+    // [...] INTERCALADO x cantiTarjetasCredito: Numero, mesVto, añoVto, codigoSeg, desc.
     // SOLO si es Organizador
     // [6..] id eventos
     // y despues en otro sprint el que sea organizadr va a tener las preferencias de pago y todo eso.. definir bien a futuro.
 
-    //nota a futuro: jamás hacer esto otra vez, era mas facil levantar un serverSQL y abrir los puertos en el router..
 
-    private static final int CantidadValoresFijosCSVComprador = 9;
+    private static final int CantidadValoresFijosCSVComprador = 10;
     private static HashMap<String, Comprador> compradores = new HashMap<>();
     private static HashMap<String, Organizador> organizadores = new HashMap<>();
 
@@ -42,6 +44,7 @@ public class Autenticador {
     public static void setCompradores(HashMap<String, Comprador> compradores) {
         Autenticador.compradores = compradores;
     }
+
 
     public static HashMap<String, Organizador> getOrganizadores() {
         return organizadores;
@@ -67,6 +70,10 @@ public class Autenticador {
                 userLine.append(comprador.getEmail()).append(",");
                 userLine.append(comprador.getFecha_nacimiento()).append(",");
                 userLine.append(comprador.getPreferencias().size()).append(",");
+                userLine.append(comprador.getMetodosPago().size()).append(",");
+                for(String s : comprador.getPreferencias()){
+                    userLine.append(s).append(",");
+                }
                 // [...] INTERCALADO x CantidadEventos: ID Evento, nroButaca, true/false=comprada/reservada, si el anterior es true tiene retiro/envio , direccion (ya sea de env
                 for(Map.Entry<Integer, Integer> e1 : comprador.getCompras().entrySet()){
                     userLine.append(e1.getKey()).append(",");
@@ -76,12 +83,21 @@ public class Autenticador {
                     //el default ese no deberia pasar NUNCA pero prefiero esto antes que crashee el programa
                     userLine.append(comprador.getEnvios().getOrDefault(e1.getKey(),new Envio(false,"")).getDireccion()).append(",");
                 }
+                //TODO: este for no va pero para sacarlo hay que cambiar la cantidad de veces q cicla al levartarno pq ahora tiene sumado esto
                 for(Map.Entry<Integer, Integer> e1 : comprador.getReservas().entrySet()){
                     userLine.append(e1.getKey()).append(",");
                     userLine.append(e1.getValue()).append(",");
                     userLine.append("false").append(",");
                     userLine.append("false").append(",");
                     userLine.append("N/A").append(",");
+                }
+                for(MetodoPago m : comprador.getMetodosPago()){
+                    Tarjeta t = (Tarjeta)m;
+                    userLine.append(t.getNumeroTarjeta()).append(",");
+                    userLine.append(t.getMesVto()).append(",");
+                    userLine.append(t.getAnioVto()).append(",");
+                    userLine.append(t.getCodigoSeg()).append(",");
+                    userLine.append(t.getDescripcion()).append(",");
                 }
                 userLine.setLength(userLine.length() - 1);
                 userLine.append("\n");
@@ -126,8 +142,11 @@ public class Autenticador {
         // [6] Email
         // [7] Nacimiento
         // [8] CantPreferencias
-        // [9..] Lista de preferencias
+        // [9] CantTarjetasCredito
+        // [10..] Lista de preferencias
         // [...] INTERCALADO x CantidadEventos: ID Evento, nroButaca, true/false=comprada/reservada, si el anterior es true tiene retiroTRUE/envioFALSE , direccion (ya sea de envio o retiro)
+        // [...] INTERCALADO x cantiTarjetasCredito: Numero, mesVto, añoVto, codigoSeg, desc.
+        // En el comprador el metodo de pagoMisCuentas no se guarda nada ya que toda la verificacion la hace el sistema, el comprador solamente va a realizar un pago con un codigo, no tenemos que tener su cuenta ni nada.
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))){
             while ((line = br.readLine()) != null) {
                 data = line.split(",");
@@ -145,6 +164,8 @@ public class Autenticador {
                     String email = data[6];
                     LocalDate nacimiento = LocalDate.parse(data[7]);
                     int cantPreferencias = Integer.parseInt(data[8]);
+                    int cantTarjetasCredito = Integer.parseInt(data[9]);
+                    ArrayList<MetodoPago> metodosPago = new ArrayList<>();
                     ArrayList<String> preferencias = new ArrayList<>();
                     HashMap<Integer, Envio> envios = new HashMap<>();
                     HashMap<Integer, Integer> reservas = new HashMap<>();
@@ -164,11 +185,22 @@ public class Autenticador {
                             comprasConfirmadas.put(idEvento,nroButaca);
                             envios.put(idEvento, new Envio(retiraPorSucursal, direccion));
                         }else{
-                            reservas.put(idEvento, nroButaca);
+                            reservas.put(idEvento, nroButaca); //TODO: no hace falta, las reservas no se guarda y listo
                         }
                         i = i+5;
                     }
-                    compradores.put(id, new Comprador(nombre,apellido,id,contrasenia,email,nacimiento,preferencias,envios,comprasConfirmadas,reservas));
+                    int offsetActual = CantidadValoresFijosCSVComprador + cantPreferencias + i;
+                    for(int j = 0; j < cantTarjetasCredito; j++){
+                        String nroTarjeta = data[j + offsetActual];
+                        int mes = Integer.parseInt(data[j + offsetActual + 1]);
+                        int anio = Integer.parseInt(data[j + offsetActual + 2]);
+                        int ccv = Integer.parseInt(data[j + offsetActual + 3]);
+                        String desc = data[j + offsetActual + 4];
+                        Tarjeta t = new Tarjeta(nroTarjeta,ccv,mes,anio);
+                        t.setDescripcion(desc);
+                        metodosPago.add(t);
+                    }
+                    compradores.put(id, new Comprador(nombre,apellido,id,contrasenia,email,nacimiento,preferencias,envios,comprasConfirmadas,reservas,metodosPago));
                 }
             }
         } catch (IOException e) {
@@ -227,8 +259,8 @@ public class Autenticador {
             if(compradores.containsKey(id)){
                 return 2;
             }
-            compradores.put(id ,new Comprador(nombre,apellido,id,contrasenia,"N/A",LocalDate.EPOCH,new ArrayList<>(),
-                    new HashMap<>(),new HashMap<>(),new HashMap<>()));
+            compradores.put(id,new Comprador(nombre,apellido,id,contrasenia,"N/A",LocalDate.EPOCH,new ArrayList<>(),
+                    new HashMap<>(),new HashMap<>(),new HashMap<>(),new ArrayList<MetodoPago>()));
             return 1;
         }
         return 4; // se le pasó un tipoUsuario que no existe a la funcion
