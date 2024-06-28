@@ -133,7 +133,7 @@ public class main {
     }
 
     private static void printEventoGeneral(Evento e, int nroLista){
-        print("==[ "+nroLista+" ]=================================================================================");
+        print("==[ "+e.getId()+" ]=================================================================================");
         print("  "+e.getNombre()+" @ "+e.getUbicacion()+" 1erFecha: "+e.getFechas().getFirst());
     }
 
@@ -215,14 +215,13 @@ public class main {
             for(Map.Entry<Integer, Evento> entry : eventos.entrySet()){
                 Evento e = entry.getValue();
                 printEventoLogueado(e, entry.getKey());
-
             }
             print(" Ingresá el número de evento para expandirlo ");
             String opcion = s.nextLine();
             if(opcion.equals("d")){
                 modificarDatosPersonales(id);
             }else{
-                pantallaReservar(id, eventos.get(opcion));
+                pantallaReservar(id, eventos.get(Integer.parseInt(opcion)));
             }
 
 
