@@ -15,7 +15,7 @@ public class Comprador extends Usuario{
     private ArrayList<MetodoPago> metodosPago;
 
     Comprador(String nombre, String apellido, String Id, String contrasenia, String email, LocalDate nacimiento, ArrayList<String> preferencias,
-              HashMap<Integer, Envio> envios,HashMap<Integer,Integer> compras, HashMap<Integer,Integer> reservas, ArrayList<MetodoPago> metodosPago){
+              HashMap<Integer, Envio> envios,HashMap<Integer,Integer> compras, HashMap<Integer,Integer> reservas){
         super(nombre, apellido, Id, contrasenia);
         this.preferencias = preferencias;
         this.email = email;

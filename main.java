@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.TimerTask;
+import java.util.Timer;
 
 /*
 CRITERIOS ACEPTACION SIN VERIFICAR:
@@ -19,6 +21,7 @@ CONFIRMAR:
 // demo de app
 public class main {
     private static Scanner s = new Scanner(System.in);
+    private static boolean reserva_caducada = false;
     private static CatalogoEventos catalogo = new CatalogoEventos();
     private static HashMap<Integer, Evento> eventos;
 
@@ -28,7 +31,7 @@ public class main {
         eventos = catalogo.retornarEventos();
     }
 
-    private static void confirmarCompra(String idUsuario, Evento e, ArrayList<Integer> butacas){
+    private static void confirmarCompra(String idUsuario, LocalDate fecha, Evento e, ArrayList<Integer> butacas){
         print(e.getNombre()+" butacas: "+butacas.toString());
         print(" TOTAL entradas $$$ = "+butacas.size()*e.getPrecio());
         print(" ¿Quiere [r]etirar sus entradas o un [e]nvio a domicilio? ");
@@ -40,7 +43,7 @@ public class main {
             envio = s.nextLine();
             Envio env = new Envio(true,envio);
             for(Integer i : butacas){
-                e.getButacasOcupadas().put(i,idUsuario);
+                e.getFunciones().get(fecha).put(i,idUsuario);
                 Autenticador.getCompradores().get(idUsuario).addCompra(e.getId(),i);
             }
             Autenticador.getCompradores().get(idUsuario).addEnvio(e.getId(),env);
@@ -50,7 +53,7 @@ public class main {
             Envio env = new Envio(false,envio);
             print(" Costo de envio $$$ se cobrará cuando llegue el paquete."); //ver como calcular esto, dice que se usa un sistema del correo en el enunciado (?? supongo se podrá inventar cualq numero para la demo
             for(Integer i : butacas){
-                e.getButacasOcupadas().put(i,idUsuario);
+                e.getFunciones().get(fecha).put(i,idUsuario);
                 Autenticador.getCompradores().get(idUsuario).addCompra(e.getId(),i);
             }
             Autenticador.getCompradores().get(idUsuario).addEnvio(e.getId(),env);
@@ -59,59 +62,75 @@ public class main {
         }
     }
 
-    private static void countDownReserva(String idUsuario, Evento e, ArrayList<Integer> butacas){
-        //ver como hacer la barrita que se vaya llenando, por ahora no vencen las reservas
-        print(" Reservando para "+e.getNombre());
-        print(" Ingrese número de tarjeta de credito: ");
+    private static void countDownReserva(String idUsuario, Evento e, ArrayList<Integer> butacas, LocalDate fecha){
+        Timer t = new Timer();
+        TimerTask cuenta_reserva = new TimerTask() {
+            @Override
+            public void run(){
+                reserva_caducada = true;
+            }
+        };
+        int espera = 600; // puesto en 600 segundos (10 minutos)
+        t.schedule(cuenta_reserva, espera * 1000);
+        System.out.println(" Reservando para "+e.getNombre());
+        System.out.println(" Ingrese número de tarjeta de credito: ");
         String nroTarjeta = s.nextLine();
-        print(" Ingrese mes vto de la tarjeta: ");
+        System.out.println(" Ingrese mes vto de la tarjeta: ");
         String mVto = s.nextLine();
-        print(" Ingrese año vto de la tarjeta: ");
+        System.out.println(" Ingrese año vto de la tarjeta: ");
         String aVto = s.nextLine();
-        print(" Ingrese codigo de seguridad de la tarjeta: ");
+        System.out.println(" Ingrese codigo de seguridad de la tarjeta: ");
         String ccv = s.nextLine();
         // hacer validacion, por ahora pasa todo je
-        print(" Ingrese [c] para cancelar la reserva [s] para confirmar el pago");
+        System.out.println(" Ingrese [c] para cancelar la reserva [s] para confirmar el pago");
         String opcion = s.nextLine();
         if(opcion.equals("s")){
-            confirmarCompra(idUsuario, e, butacas);
+            if (!reserva_caducada)
+                confirmarCompra(idUsuario, fecha, e, butacas);
+            else {
+                print("La reserva ha expirado.");
+            }
         }
+        t.cancel();
+        reserva_caducada = false;
     }
 
-    private static void pantallaReservar(String idUsuario, Evento e){
-        print(" Asientos disponibles en "+e.getNombre()+" para "+e.getFechas().getFirst());
+    private static void pantallaReservar(String idUsuario, Evento e, LocalDate fecha){
+        print(" Asientos disponibles en "+e.getNombre()+" para "+ fecha.toString());
         //TODO: verificar que si no hay lugares se imprima antes un aviso que esta full
         for(int i = 0; i < e.getCapacidad(); i++){
             if(i % 15 == 0){print("");}
-            if(!e.getButacasOcupadas().containsKey(i)){
-                System.out.print(i);
+            if(!e.getFunciones().get(fecha).containsKey(i)){
+                System.out.print(" " + i + " ");
             }
         }
         print(" Ingrese cantidad de entradas que quiere comprar. "); //TODO: verificar que no sea mayor a la cantidad disponible..
         String cantidad = s.nextLine();
-        print(" Ingrese un número de butaca para crear una reserva. [c] para volver atrás");
+        print(" Ingrese [r] si desea hacer una reserva. Ingrese cualquier valor para volver atrás");
         String opcion = s.nextLine();
-        if(opcion.equals("c")){
-            print(" Volviendo al menu principal");
-        }else{
+        if (opcion.equals("r")){
             ArrayList<Integer> butacasReservadas = new ArrayList<>();
             for(int i = 0; i < Integer.parseInt(cantidad); i++){
-                print(" Ingrese numero de butaca para su entrada n "+i+1);
+                print(" Ingrese numero de butaca para su entrada n "+(i+1));
                 butacasReservadas.add(Integer.parseInt(s.nextLine()));
             }
-            countDownReserva(idUsuario, e, butacasReservadas);
+            countDownReserva(idUsuario, e, butacasReservadas, fecha);
         }
-    };
+    }
 
     private static void printEventoLogueado(Evento e, int nroLista){
-        print("==[ "+nroLista+" ]=================================================================================");
-        print("  "+e.getNombre()+" @ "+e.getUbicacion()+" $$$ "+e.getPrecio()+" 1erFecha: "+e.getFechas().getFirst());
-        print("  "+e.getDescripcion()+"   "+e.getTipo_evento()+" ocup: "+e.getCantButacasOcupadas()+"/"+e.getCapacidad());
+        for (LocalDate fecha : e.getFechas()){
+            print("==[ "+nroLista+" ]=================================================================================");
+            print("  "+e.getNombre()+" @ "+e.getUbicacion()+" $$$ "+e.getPrecio()+" Fecha: "+ fecha);
+            print("  "+e.getDescripcion()+"   "+e.getTipo_evento()+" ocup: "+e.getCantButacasOcupadas(fecha)+"/"+e.getCapacidad());
+        }
     }
 
     private static void printEventoGeneral(Evento e, int nroLista){
         print("==[ "+nroLista+" ]=================================================================================");
-        print("  "+e.getNombre()+" @ "+e.getUbicacion()+" 1erFecha: "+e.getFechas().getFirst());
+        print("  "+e.getNombre()+" @ "+e.getUbicacion());
+        print("Fechas Disponibles: ");
+        e.printFechas();
     }
 
     private static void print(String s){
@@ -165,11 +184,11 @@ public class main {
             LocalDate nacimiento = LocalDate.parse(s.nextLine());
             Autenticador.getCompradores().getOrDefault(id,null).setFecha_nacimiento(nacimiento);
             boolean masTiposEventos = true;
-            print(" Seleccioná que tipo de eventos te interesan: ");
             while(masTiposEventos){
                 ArrayList<String> eventosSinSeleccionar = DispatcherPreferencias.getPreferencias();
                 eventosSinSeleccionar.removeAll(Autenticador.getCompradores().getOrDefault(id, null).getPreferencias()); //otra vez habria que chequear que no sea null
                 if(eventosSinSeleccionar.size() != 0) {
+                    print(" Seleccioná que tipo de eventos te interesan: ");
                     print(" Marcá un tipo y presioná enter. ");
                     int i = 1;
                     for (String s : eventosSinSeleccionar) {
@@ -188,21 +207,35 @@ public class main {
         }
         boolean cerrarSesion = false;
         while(!cerrarSesion){
-            print(" Bienvenidx "+Autenticador.getCompradores().getOrDefault(id, null).getNombre()+"   Ingresá [d] para mofidicar tus datos personales, o elegí un evento:");
-            for(Map.Entry<Integer, Evento> entry : eventos.entrySet()){
-                Evento e = entry.getValue();
-                printEventoLogueado(e, entry.getKey());
-
-            }
-            print(" Ingresá el número de evento para expandirlo ");
+            print(" Bienvenidx "+Autenticador.getCompradores().getOrDefault(id, null).getNombre()+"   [M]ofidifique sus datos personales, [C]ierre sesión, o [L]iste Eventos Disponibles:");
             String opcion = s.nextLine();
-            if(opcion.equals("d")){
-                modificarDatosPersonales(id);
-            }else{
-                pantallaReservar(id, eventos.get(opcion));
+            if (opcion.equals("L")){
+                for(Map.Entry<Integer, Evento> entry : eventos.entrySet()){
+                    Evento e = entry.getValue();
+                    printEventoLogueado(e, entry.getKey());
+    
+                }
+                print(" Ingresá el número de evento para expandirlo o [R]egrese al menú previo:");
+                String numstr = s.nextLine();
+                Integer num = Integer.parseInt(numstr);
+                if (eventos.get(num) != null){
+                    if (!eventos.get(num).getFechas().isEmpty()){
+                        print("Ingrese una fecha de las disponibles: ");
+                        eventos.get(num).printFechas();
+                        String fecha = s.nextLine();
+                        if (eventos.get(num).getFechas().contains(LocalDate.parse(fecha)) != false){
+                            pantallaReservar(id, eventos.get(num), LocalDate.parse(fecha));
+                        }
+                    }
+                } else {
+                    print("No se halló el evento con el número ingresado :C");
+                }
             }
-
-
+            if(opcion.equals("M")){
+                modificarDatosPersonales(id);
+            }else if (opcion.equals("C")){
+                cerrarSesion = true;
+            }
         }
     }
 
@@ -219,9 +252,7 @@ public class main {
             System.out.println(" Bienvenidx a TUSUPERENTRADA ");
             System.out.println(" Vista general, aún no iniciaste sesión ");
             System.out.println(" Preview de eventos: ");
-            for(Map.Entry<Integer,Evento> entry : eventos.entrySet()){
-                printEventoGeneral(entry.getValue(), entry.getKey());
-            }
+            eventos.entrySet().stream().limit(5).forEach(entry -> printEventoGeneral(entry.getValue(), entry.getKey())); // que imprima nomas 5 de los eventos
             System.out.println(" Presione 1 para inciar sesion ");
             System.out.println(" Presione 2 para registrarse ");
             System.out.println(" Presione 3 para salir ");

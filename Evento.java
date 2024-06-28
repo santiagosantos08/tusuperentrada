@@ -1,7 +1,6 @@
 
 import java.time.LocalDate;
-
-import java.util.ArrayList;
+import java.util.Set;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -9,32 +8,25 @@ public class Evento {
     private int capacidad, id, precio;
     private String nombre, ubicacion,descripcion, imagen_url, tipo_evento; //las fotos tiene que ser muchas!!!!!!!!!!!!! en otra entrega será
                                                                             //o de ultima para safar que sean links a google fotos y veo que si no esta logueado le
-                                                                            //cambio acá algun argumento al link para que solo muestre algunas NO SE
-    private ArrayList<LocalDate> fechas;
-    private HashMap<Integer, String> butacasOcupadas; //mapa de nroButaca -> Id comprador que la tiene.
+    private HashMap<LocalDate, HashMap<Integer, String>> fechas;                                                                     //cambio acá algun argumento al link para que solo muestre algunas NO SE
     private String org_id;
 
-    public Evento(int capacidad, String nombre, String ubicacion, String descripcion, String imagen_url,
-                  String tipo_evento, ArrayList<LocalDate> fechas, int id, String org_id, HashMap<Integer,String> asientos) {
+    public Evento(int capacidad, String nombre, String ubicacion, String descripcion,   String c,
+                  String tipo_evento, int id, String org_id) {
         //chequear que ninguno de los String tenga comas!!!!!!
         this.capacidad = capacidad;
         this.nombre = nombre;
         this.ubicacion = ubicacion;
         this.descripcion = descripcion;
-        this.imagen_url = imagen_url;
+        this.imagen_url = c;
         this.tipo_evento = tipo_evento;
-        if(fechas != null){
-            this.fechas = fechas;
-        }else{
-            this.fechas = new ArrayList<>();
-        }
-        if (asientos != null){ //cuando se crea desde la interfaz se le tiene que pasar null
-            this.butacasOcupadas = asientos;
-        }else{
-            this.butacasOcupadas = new HashMap<>();
-        }
+        this.fechas = new HashMap<>();
         this.id = id;
         this.org_id = org_id;
+    }
+
+    public void setPrecio(int precio){
+        this.precio = precio;
     }
 
     public int getPrecio(){
@@ -73,40 +65,55 @@ public class Evento {
         return tipo_evento;
     }
 
-    public ArrayList<LocalDate> getFechas() {
-        return this.fechas;
+    public Set<LocalDate> getFechas() {
+        return this.fechas.keySet();
     }
 
     public int getId() {
         return id;
     }
 
-    public HashMap<Integer, String> getButacasOcupadas(){
-        return this.butacasOcupadas;
+    public HashMap<LocalDate, HashMap<Integer, String>> getFunciones(){
+        return fechas;
+    }
+
+    public HashMap<Integer, String> getButacasOcupadas(LocalDate fecha){
+        return fechas.get(fecha);
     }
     //acomodar esto!°!
-    public boolean asientoDisponible(int nro_asiento) {
+    public boolean asientoDisponible(LocalDate fecha, int nro_asiento) {
         if (nro_asiento <= 0 || nro_asiento > capacidad){
             return false;
         }
-        return butacasOcupadas.containsKey(nro_asiento-1);
+        return fechas.get(fecha).containsKey(nro_asiento-1);
 
     }
-    public boolean seleccionarAsiento(int nro_asiento, String idComprador) {
+    public boolean seleccionarAsiento(int nro_asiento, String idComprador, LocalDate fecha) {
         if (nro_asiento > 0 || nro_asiento <= capacidad) {
-            if (asientoDisponible(nro_asiento)) {
-                butacasOcupadas.put(nro_asiento-1,idComprador);
+            if (asientoDisponible(fecha, nro_asiento)) {
+                fechas.get(fecha).put(nro_asiento-1,idComprador);
             }
         }
         return false;
     }
-    public int getCantButacasOcupadas(){
-        return butacasOcupadas.size();
+    public int getCantButacasOcupadas(LocalDate fecha){
+        return fechas.get(fecha).size();
+    }
+
+    public void agregarFecha(String fechastr){
+        LocalDate fecha = LocalDate.parse(fechastr);
+        fechas.put(fecha, new HashMap<>());
+    }
+
+    public void printFechas(){
+        for (LocalDate fecha : fechas.keySet()){
+            System.out.println(fecha.toString());
+        }
     }
 
     public String toString() {
         String fechasEvento = "";
-        for(LocalDate l : fechas){
+        for(LocalDate l : fechas.keySet()){
             fechasEvento = fechasEvento.concat(l.toString() + "|");
         }
         return "Evento{" +

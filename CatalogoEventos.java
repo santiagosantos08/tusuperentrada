@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class CatalogoEventos {
@@ -16,7 +17,7 @@ public class CatalogoEventos {
     }
 
     private final String archivo_eventos = "eventos.csv";
-    private final int cantValoresFijosCSV = 11; //cantidad de cosas que hay antes de que se almacenen los datos variables en el csv
+    private final int cantValoresFijosCSV = 10; //cantidad de cosas que hay antes de que se almacenen los datos variables en el csv
 
     public void agregarEvento(Evento evento){
         eventos.put(evento.getId(),evento);
@@ -41,17 +42,27 @@ public class CatalogoEventos {
                 String tipoEvento = data[7];
                 int precio = Integer.parseInt(data[8]);
                 int cantFunciones = Integer.parseInt(data[9]);
-                int cantCompradores = Integer.parseInt(data[10]);
-                ArrayList<LocalDate> fechas = new ArrayList<>();
-                HashMap<Integer, String> butacas = new HashMap<>();
-                for(int i = 0; i < cantFunciones; i++){
-                    fechas.add(LocalDate.parse(data[cantValoresFijosCSV + i]));
+                Evento evento = new Evento(capacidad, nombreEvento, ubicacion, descripcion, urlImagen, tipoEvento, idEvento, idOrganizador);
+                evento.setPrecio(precio);
+                int f = 0;
+                int i = 0;
+                while (f < cantFunciones){
+                    LocalDate fecha = LocalDate.parse(data[cantValoresFijosCSV + i]);
+                    evento.agregarFecha(fecha.toString());
+                    i++;
+                    int butacasOcupadas = Integer.parseInt(data[cantValoresFijosCSV + i]);
+                    i++;
+                    int j = i + cantValoresFijosCSV;
+                    while (cantValoresFijosCSV + i < (j + (butacasOcupadas * 2) - 1)){
+                        String id = data[cantValoresFijosCSV + i];
+                        i++;
+                        int numero = Integer.parseInt(data[cantValoresFijosCSV + i]);
+                        evento.getFunciones().get(fecha).put(numero, id);
+                        i++;
+                    }
+                    f++;
                 }
-                for(int i = 0; i < cantCompradores * 2; i = i+2){
-                    butacas.put(Integer.parseInt(data[cantValoresFijosCSV + cantFunciones + i + 1]),data[cantValoresFijosCSV + cantFunciones + i]);
-                }
-                Evento nuevo = new Evento(capacidad,nombreEvento,ubicacion,descripcion,urlImagen,tipoEvento,fechas,idEvento,idOrganizador,butacas);
-                eventos.put(nuevo.getId(),nuevo);
+                eventos.put(evento.getId(),evento);
             }
             return true;
         } catch (IOException e) {
@@ -78,21 +89,20 @@ public class CatalogoEventos {
                 eLine.append(e.getImagen_url()).append(",");
                 eLine.append(e.getTipo_evento()).append(",");
                 eLine.append(e.getPrecio()).append(",");
-                eLine.append(e.getCantFunciones()).append(",");
-                eLine.append(e.getCantButacasOcupadas()).append(",");
-                ArrayList<LocalDate> fechas = e.getFechas();
-                HashMap<Integer, String> butacas = e.getButacasOcupadas();
-                for(LocalDate l : fechas){
-                    eLine.append(l.toString()).append(",");
-                }
-                for(Map.Entry<Integer, String> entryButacas : butacas.entrySet()){
-                    eLine.append(entryButacas.getValue()).append(",");
-                    eLine.append(entryButacas.getKey()).append(",");
+                eLine.append(e.getCantFunciones()).append(","); // Hasta aca
+                for (LocalDate fecha: e.getFechas()){ // dios me quiero matar
+                    eLine.append(fecha.toString()).append(",");
+                    eLine.append(e.getCantButacasOcupadas(fecha)).append(",");
+                    for (Map.Entry<Integer, String> entryButacas : e.getButacasOcupadas(fecha).entrySet()){
+                        eLine.append(entryButacas.getValue()).append(",");
+                        eLine.append(entryButacas.getKey()).append(",");
+                    }
                 }
                 eLine.setLength(eLine.length() - 1); //saca la ultima coma, haria falta verificar que no sea 0 -> -1 pero buee muy edge case
                 eLine.append("\n");
                 writer.append(eLine);
             }
+            System.out.println("Catálogo guardado con éxito c:");
             return true;
         } catch (IOException e) {
             e.printStackTrace();
