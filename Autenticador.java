@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +5,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
 
 public class Autenticador {
@@ -177,6 +175,7 @@ public class Autenticador {
             Tarjeta t = new Tarjeta(nroTarjeta,ccv,mes,anio);
             t.setDescripcion(desc);
             metodosPago.add(t);
+            offsetActual = offsetActual + 4;
         }
         compradores.put(id, new Comprador(nombre,apellido,id,contrasenia,email,nacimiento,preferencias,envios,comprasConfirmadas,metodosPago));
     }
@@ -191,7 +190,7 @@ public class Autenticador {
         String apellido = data[2];
         String id = data[3];
         String contrasenia = data[4];
-        int cantEventos = Integer.parseInt(data[5]);
+        //int cantEventos = Integer.parseInt(data[5]); no implementado
         organizadores.put(id,new Organizador(nombre,apellido,id,contrasenia));
     }
 

@@ -6,18 +6,6 @@ import java.util.Scanner;
 import java.util.TimerTask;
 import java.util.Timer;
 
-/*
-CRITERIOS ACEPTACION SIN VERIFICAR:
-
-
-RESERVAR:
-    Se debe de mostrar las diferentes tarjetas de credito y sus promociones // YA SE MUESTRA
-    Se debe de guardar todo lo que haya saleccionado el usuario,  la reserva dura unos minutos // AHORA SI VENCE, FIJADO PARA 1 MINUTO Y MEDIO
-CONFIRMAR:
-    Se debe de mostrar las tarjetas disponibles // YA SE MUESTRA
-    Ser debe notifica la compra exitosa (ver user storie Tu-37) // ya se notifica por pantalla, si se referia a por mail queda para despues
-
- */
 // demo de app
 public class main {
     private static Scanner s = new Scanner(System.in);
@@ -84,6 +72,21 @@ public class main {
         }
     }
 
+    private static Tarjeta nuevaTarjeta(Tarjeta tarjeta, Comprador c){
+        System.out.println(" Ingrese número de tarjeta de credito: ");
+        String nroTarjeta = s.nextLine();
+        System.out.println(" Ingrese mes vto de la tarjeta: ");
+        int mVto = Integer.parseInt(s.nextLine());
+        System.out.println(" Ingrese año vto de la tarjeta: ");
+        int aVto = Integer.parseInt(s.nextLine());
+        System.out.println(" Ingrese codigo de seguridad de la tarjeta: ");
+        int ccv = Integer.parseInt(s.nextLine());
+        tarjeta = new Tarjeta(nroTarjeta, ccv, mVto, aVto);
+        c.agregarMetodosPago(tarjeta);
+        print("Su tarjeta tendrá un descuento de %" + tarjeta.getPorcentajeDescuento() + " en la compra!!!");
+        return tarjeta;
+    }
+
     private static void countDownReserva(String idUsuario, Evento e, ArrayList<Integer> butacas, LocalDate fecha){
         Timer t = new Timer();
         TimerTask cuenta_reserva = new TimerTask() {
@@ -93,16 +96,17 @@ public class main {
                 t.cancel();
             }
         };
-        int espera = 90; // puesto en 90 segundos para testeo
+        int espera = 90; // timer puesto en 90 segundos 
         t.schedule(cuenta_reserva, espera * 1000);
         System.out.println(" Reservando para "+e.getNombre());
         Comprador c = Autenticador.getCompradores().get(idUsuario);
         ArrayList<MetodoPago> aux = c.getMetodosPago();
         Tarjeta tarjeta = null;
+        String aux1 = "-";
         if (aux.size() > 0) {
             print("Usted ya posee metodos de pago, si desea seleccionar alguno de ellos ingrese[s]." +
-                    " Si desea agregar un metodo nuevo ingrese cualquier otra tecla");
-            String aux1 = s.nextLine();
+                    "Puede agregar un nuevo metodo de pago presionando cualquier otra tecla.");
+            aux1 = s.nextLine();
             if(aux1.toLowerCase().equals("s")){
                 print("Ingrese la opcion correspondiente");
                 for (int i = 0; i<aux.size(); i++){
@@ -116,20 +120,13 @@ public class main {
                     opcion = Integer.parseInt(s.nextLine());
                 }
                 tarjeta = (Tarjeta) aux.get(opcion - 1);
+            } else {
+                tarjeta = nuevaTarjeta(tarjeta, c);
             }
         }
         else {
             print("usted no posee metodos de pago debera ingresar uno");
-            System.out.println(" Ingrese número de tarjeta de credito: ");
-            String nroTarjeta = s.nextLine();
-            System.out.println(" Ingrese mes vto de la tarjeta: ");
-            int mVto = Integer.parseInt(s.nextLine());
-            System.out.println(" Ingrese año vto de la tarjeta: ");
-            int aVto = Integer.parseInt(s.nextLine());
-            System.out.println(" Ingrese codigo de seguridad de la tarjeta: ");
-            int ccv = Integer.parseInt(s.nextLine());
-            tarjeta = new Tarjeta(nroTarjeta, ccv, mVto, aVto);
-            c.agregarMetodosPago(tarjeta);
+            tarjeta = nuevaTarjeta(tarjeta, c);
         }
         // hacer validacion, por ahora pasa todo je
         System.out.println(" Ingrese [c] para cancelar la reserva [s] para confirmar el pago");

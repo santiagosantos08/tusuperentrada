@@ -30,7 +30,7 @@ public class Envio {
             Scanner scanner = new Scanner(System.in);
             System.out.print("Ingrese el número de código postal: ");
             int codigoPostal = scanner.nextInt();
-
+            scanner.close();
             if (codigoPostal > 6000) {
                 return 1500.0;
             } else {

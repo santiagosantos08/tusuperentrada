@@ -1,9 +1,6 @@
 
 import java.time.LocalDate;
-import java.util.Random;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Set;
 
 public class Evento {
