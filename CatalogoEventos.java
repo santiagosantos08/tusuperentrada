@@ -102,7 +102,6 @@ public class CatalogoEventos {
                 eLine.append("\n");
                 writer.append(eLine);
             }
-            System.out.println("Catálogo guardado con éxito c:");
             return true;
         } catch (IOException e) {
             e.printStackTrace();

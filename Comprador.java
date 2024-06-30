@@ -8,18 +8,16 @@ public class Comprador extends Usuario{
     private ArrayList<String> preferencias;
     private HashMap<Integer, Envio> envios; //de ID evento -> Envio
     private HashMap<Integer, Integer> compras; // de ID evento -> nro butaca
-    private HashMap<Integer, Integer> reservas; // eventos que tiene reservados pero no comprados -> nro butaca reservada
     private ArrayList<MetodoPago> metodosPago;
 
     Comprador(String nombre, String apellido, String Id, String contrasenia, String email, LocalDate nacimiento, ArrayList<String> preferencias,
-              HashMap<Integer, Envio> envios,HashMap<Integer,Integer> compras, HashMap<Integer,Integer> reservas, ArrayList<MetodoPago> metodosPago){
+              HashMap<Integer, Envio> envios,HashMap<Integer,Integer> compras, ArrayList<MetodoPago> metodosPago){
         super(nombre, apellido, Id, contrasenia);
         this.preferencias = preferencias;
         this.email = email;
         this.fecha_nacimiento = nacimiento;
         this.envios = envios;
         this.compras = compras;
-        this.reservas = reservas;
         this.metodosPago = metodosPago;
     }
 
@@ -70,15 +68,7 @@ public class Comprador extends Usuario{
     public void setCompras(HashMap<Integer, Integer> compras) {
         this.compras = compras;
     }
-
-    public HashMap<Integer, Integer> getReservas() {
-        return reservas;
-    }
-
-    public void setReservas(HashMap<Integer, Integer> reservas) {
-        this.reservas = reservas;
-    }
-
+    
     public ArrayList<MetodoPago> getMetodosPago() {
         return metodosPago;
     }

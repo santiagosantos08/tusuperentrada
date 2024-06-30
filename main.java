@@ -11,11 +11,11 @@ CRITERIOS ACEPTACION SIN VERIFICAR:
 
 
 RESERVAR:
-    Se debe de mostrar las diferentes tarjetas de credito y sus promociones // entiendo que no entra para este sprint ya que no hay tarjetas como tal
-    Se debe de guardar todo lo que haya saleccionado el usuario,  la reserva dura unos minutos // aun no vence
+    Se debe de mostrar las diferentes tarjetas de credito y sus promociones // YA SE MUESTRA
+    Se debe de guardar todo lo que haya saleccionado el usuario,  la reserva dura unos minutos // AHORA SI VENCE, FIJADO PARA 1 MINUTO Y MEDIO
 CONFIRMAR:
-    Se debe de mostrar las tarjetas disponibles // como todavia no hay tarjetas medio q imposible
-    Se debe notificar la compra exitosa (ver user storie Tu-37) // ya se notifica por pantalla, si se referia a por mail queda para despues
+    Se debe de mostrar las tarjetas disponibles // YA SE MUESTRA
+    Ser debe notifica la compra exitosa (ver user storie Tu-37) // ya se notifica por pantalla, si se referia a por mail queda para despues
 
  */
 // demo de app
@@ -31,9 +31,29 @@ public class main {
         eventos = catalogo.retornarEventos();
     }
 
-    private static void confirmarCompra(String idUsuario, LocalDate fecha, Evento e, ArrayList<Integer> butacas){
+    private static void manejarReservaExpirada(Evento e, LocalDate fecha, ArrayList<Integer> butacas){
+        print(" La reserva expiró.");
+        for (Integer butaca : butacas){
+            e.getFunciones().get(fecha).remove(butaca);
+        }
+        butacas.clear();
+        reserva_caducada = false;
+    }
+
+    private static void manejarCompraExitosa(Evento e, LocalDate fecha, ArrayList<Integer> butacas, boolean retiro, String envio, String idUsuario){
+        Envio env = new Envio(retiro,envio);
+        for(Integer i : butacas){
+            e.getFunciones().get(fecha).put(i,idUsuario);
+            Autenticador.getCompradores().get(idUsuario).addCompra(e.getId(),i);
+            }
+        Autenticador.getCompradores().get(idUsuario).addEnvio(e.getId(),env);
+        print("Compra Exitosa c:");
+    }
+
+    private static void confirmarCompra(String idUsuario, Tarjeta tarjeta, LocalDate fecha, Evento e, ArrayList<Integer> butacas, Timer t){
         print(e.getNombre()+" butacas: "+butacas.toString());
-        print(" TOTAL entradas $$$ = "+butacas.size()*e.getPrecio());
+        double precio_base = butacas.size()*e.getPrecio();
+        print(" Monto total de entradas ->  $"+precio_base + " | Con descuento por tarjeta -> $" + (precio_base - ((tarjeta.getPorcentajeDescuento()*precio_base)/100)));
         print(" ¿Quiere [r]etirar sus entradas o un [e]nvio a domicilio? ");
         print(" Aún puede cancelar la compra con [c] ");
         String opcion = s.nextLine();
@@ -41,24 +61,26 @@ public class main {
         if(opcion.equals("r")){
             print(" Indique su codigo postal, la terminal de retiro mas cercana a ud será enviada por email"); //es mentira!!! todo mockup
             envio = s.nextLine();
-            Envio env = new Envio(true,envio);
-            for(Integer i : butacas){
-                e.getFunciones().get(fecha).put(i,idUsuario);
-                Autenticador.getCompradores().get(idUsuario).addCompra(e.getId(),i);
-            }
-            Autenticador.getCompradores().get(idUsuario).addEnvio(e.getId(),env);
+            if (!reserva_caducada) {
+                manejarCompraExitosa(e, fecha, butacas, reserva_caducada, envio, idUsuario);
+                t.cancel();
+            } else 
+                manejarReservaExpirada(e, fecha, butacas);
         }else if(opcion.equals("e")){
             print(" Indique su dirección en formato Cod.postal-Calle-Nro-Piso-Dpto");
             envio = s.nextLine();
-            Envio env = new Envio(false,envio);
-            print(" Costo de envio $$$ se cobrará cuando llegue el paquete."); //ver como calcular esto, dice que se usa un sistema del correo en el enunciado (?? supongo se podrá inventar cualq numero para la demo
-            for(Integer i : butacas){
-                e.getFunciones().get(fecha).put(i,idUsuario);
-                Autenticador.getCompradores().get(idUsuario).addCompra(e.getId(),i);
-            }
-            Autenticador.getCompradores().get(idUsuario).addEnvio(e.getId(),env);
+            if (!reserva_caducada) {
+                manejarCompraExitosa(e, fecha, butacas, false, envio, idUsuario);
+                print(" Costo de envio $$$ se cobrará cuando llegue el paquete."); //ver como calcular esto, dice que se usa un sistema del correo en el enunciado (?? supongo se podrá inventar cualq numero para la demo
+                t.cancel();
+            } else 
+                manejarReservaExpirada(e, fecha, butacas);
         }else{
             print(" Compra Cancelada.");
+            for (Integer butaca : butacas){
+                e.getFunciones().get(fecha).remove(butaca);
+            }
+            t.cancel();
         }
     }
 
@@ -68,13 +90,15 @@ public class main {
             @Override
             public void run(){
                 reserva_caducada = true;
+                t.cancel();
             }
         };
-        int espera = 600; // puesto en 600 segundos (10 minutos)
+        int espera = 90; // puesto en 90 segundos para testeo
         t.schedule(cuenta_reserva, espera * 1000);
         System.out.println(" Reservando para "+e.getNombre());
         Comprador c = Autenticador.getCompradores().get(idUsuario);
         ArrayList<MetodoPago> aux = c.getMetodosPago();
+        Tarjeta tarjeta = null;
         if (aux.size() > 0) {
             print("Usted ya posee metodos de pago, si desea seleccionar alguno de ellos ingrese[s]." +
                     " Si desea agregar un metodo nuevo ingrese cualquier otra tecla");
@@ -82,14 +106,16 @@ public class main {
             if(aux1.toLowerCase().equals("s")){
                 print("Ingrese la opcion correspondiente");
                 for (int i = 0; i<aux.size(); i++){
-                    Tarjeta tarjeta = (Tarjeta) aux.get(i);
-                    print("Opcion " + (i+1) + "numero de tarjeta: " + tarjeta.getNumeroTarjeta());
+                    tarjeta = (Tarjeta) aux.get(i);
+                    print("Opcion " + (i+1) + " Tarjeta terminada en: " + tarjeta.getNumeroTarjeta().substring(tarjeta.getNumeroTarjeta().length() - 4));
+                    print("Con descuento del " + tarjeta.getPorcentajeDescuento() + "%");
                 }
                 int opcion = Integer.parseInt(s.nextLine());
                 while(opcion < 1 || opcion > aux.size()) {
                     print("ingrese una opcion valida");
                     opcion = Integer.parseInt(s.nextLine());
                 }
+                tarjeta = (Tarjeta) aux.get(opcion - 1);
             }
         }
         else {
@@ -102,21 +128,20 @@ public class main {
             int aVto = Integer.parseInt(s.nextLine());
             System.out.println(" Ingrese codigo de seguridad de la tarjeta: ");
             int ccv = Integer.parseInt(s.nextLine());
-            Tarjeta tar = new Tarjeta(nroTarjeta, ccv, mVto, aVto);
-            c.agregarMetodosPago(tar);
+            tarjeta = new Tarjeta(nroTarjeta, ccv, mVto, aVto);
+            c.agregarMetodosPago(tarjeta);
         }
         // hacer validacion, por ahora pasa todo je
         System.out.println(" Ingrese [c] para cancelar la reserva [s] para confirmar el pago");
         String opcion = s.nextLine();
         if(opcion.equals("s")){
-            if (!reserva_caducada)
-                confirmarCompra(idUsuario, fecha, e, butacas);
-            else {
-                print("La reserva ha expirado.");
+            if (!reserva_caducada) {
+                confirmarCompra(idUsuario, tarjeta, fecha, e, butacas, t);
+            } else {
+                manejarReservaExpirada(e, fecha, butacas);
+
             }
         }
-        t.cancel();
-        reserva_caducada = false;
     }
 
     private static void pantallaReservar(String idUsuario, Evento e, LocalDate fecha){
@@ -128,15 +153,18 @@ public class main {
                 System.out.print(" " + i + " ");
             }
         }
-        print(" Ingrese cantidad de entradas que quiere comprar. "); //TODO: verificar que no sea mayor a la cantidad disponible..
-        String cantidad = s.nextLine();
+        System.out.println("");
         print(" Ingrese [r] si desea hacer una reserva. Ingrese cualquier valor para volver atrás");
         String opcion = s.nextLine();
         if (opcion.equals("r")){
+            print(" Ingrese cantidad de entradas que quiere comprar. "); //TODO: verificar que no sea mayor a la cantidad disponible..
+            String cantidad = s.nextLine();
             ArrayList<Integer> butacasReservadas = new ArrayList<>();
             for(int i = 0; i < Integer.parseInt(cantidad); i++){
                 print(" Ingrese numero de butaca para su entrada n "+(i+1));
-                butacasReservadas.add(Integer.parseInt(s.nextLine()));
+                Integer butaca = Integer.parseInt(s.nextLine());
+                butacasReservadas.add(butaca);
+                e.getFunciones().get(fecha).put(butaca ,idUsuario);
             }
             countDownReserva(idUsuario, e, butacasReservadas, fecha);
         }
