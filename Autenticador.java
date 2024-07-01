@@ -82,7 +82,6 @@ public class Autenticador {
             userline.append(t.getMesVto()).append(",");
             userline.append(t.getAnioVto()).append(",");
             userline.append(t.getCodigoSeg()).append(",");
-            userline.append(t.getDescripcion()).append(",");
         }
         userline.setLength(userline.length() - 1);
         userline.append("\n");
@@ -154,8 +153,8 @@ public class Autenticador {
         for(int i = 0; i < cantPreferencias; i++){
             preferencias.add(data[CantidadValoresFijosCSVComprador + i]);
         }
-        int i = CantidadValoresFijosCSVComprador + cantPreferencias;
-        while(i < CantidadValoresFijosCSVComprador + cantPreferencias + (cantEventos * 4)){
+        for (int i = CantidadValoresFijosCSVComprador + cantPreferencias;
+             i < CantidadValoresFijosCSVComprador + cantPreferencias + (cantEventos * 4); i = i+4){
             int idEvento = Integer.parseInt(data[i]);
             int nroButaca = Integer.parseInt(data[i+1]);
             //despues al guardar acordarme que si no esta confirmada igual hay que tirar 2 valores para no desalinear todo el archivo
@@ -163,19 +162,16 @@ public class Autenticador {
             String direccion = data[i+3];
             comprasConfirmadas.put(idEvento,nroButaca);
             envios.put(idEvento, new Envio(retiraPorSucursal, direccion));
-            i = i+4;
         }
-        int offsetActual = cantPreferencias + i;
-        for(int j = 0; j < cantTarjetasCredito; j++){
-            String nroTarjeta = data[j + offsetActual];
-            int mes = Integer.parseInt(data[j + offsetActual + 1]);
-            int anio = Integer.parseInt(data[j + offsetActual + 2]);
-            int ccv = Integer.parseInt(data[j + offsetActual + 3]);
-            String desc = data[j + offsetActual + 4];
+        for(int j = CantidadValoresFijosCSVComprador + cantPreferencias + (cantEventos * 4);
+            j < CantidadValoresFijosCSVComprador + cantPreferencias + (cantEventos * 4) + (cantTarjetasCredito * 4); j = j+4){
+
+            String nroTarjeta = data[j];
+            int mes = Integer.parseInt(data[j + 1]);
+            int anio = Integer.parseInt(data[j + 2]);
+            int ccv = Integer.parseInt(data[j + 3]);
             Tarjeta t = new Tarjeta(nroTarjeta,ccv,mes,anio);
-            t.setDescripcion(desc);
             metodosPago.add(t);
-            offsetActual = offsetActual + 4;
         }
         compradores.put(id, new Comprador(nombre,apellido,id,contrasenia,email,nacimiento,preferencias,envios,comprasConfirmadas,metodosPago));
     }
