@@ -12,11 +12,13 @@ public class main {
     private static boolean reserva_caducada = false;
     private static CatalogoEventos catalogo = new CatalogoEventos();
     private static HashMap<Integer, Evento> eventos;
+    private static DispatcherPreferencias preferencias = new DispatcherPreferencias();
 
     private static void inicializarSistema(){
         Autenticador.levantarDatos();
         catalogo.inicializarEventos();
         eventos = catalogo.retornarEventos();
+        preferencias.inicializarPreferencias();
     }
 
     private static void manejarReservaExpirada(Evento e, LocalDate fecha, ArrayList<Integer> butacas){
@@ -199,7 +201,7 @@ public class main {
         boolean masTiposEventos = true;
         print(" Seleccioná que tipo de eventos te interesan: "); //faltaria hacer que se puedan sacar tambien....
         while(masTiposEventos) {
-            ArrayList<String> eventosSinSeleccionar = DispatcherPreferencias.getPreferencias();
+            ArrayList<String> eventosSinSeleccionar = preferencias.getPreferencias();
             eventosSinSeleccionar.removeAll(Autenticador.getCompradores().getOrDefault(id, null).getPreferencias()); //otra vez habria que chequear que no sea null
             if (eventosSinSeleccionar.size() != 0) {
                 print(" Marcá un tipo y presioná enter. ");
@@ -209,7 +211,8 @@ public class main {
                     i++;
                 }
                 String seleccion = s.nextLine(); //chequear que sea valido capaz es una opcion que ni sale!!!
-                Autenticador.getCompradores().getOrDefault(id, null).getPreferencias().add(DispatcherPreferencias.getPreferencias().get(i - 1));
+                Autenticador.getCompradores().getOrDefault(id, null).getPreferencias().add(preferencias.getPreferencias().get(Integer.parseInt(seleccion)-1));
+                preferencias.getPreferencias().remove(seleccion);
                 print(" ¿Querés agregar más? [s/n]: ");
                 String opt = s.nextLine();
                 if (opt.equals("n")) {
@@ -223,6 +226,8 @@ public class main {
 
     public static void pantallaCompradorInicioSesion(String id, boolean recienRegistrado){
         if(recienRegistrado){
+            DispatcherPreferencias preferencias = new DispatcherPreferencias();
+            preferencias.inicializarPreferencias();
             print("!!!======================================================================================!!!");
             print(" Tenés que completar tus datos personales: ");
             print(" Ingresá tu email: ");
@@ -234,7 +239,7 @@ public class main {
             Autenticador.getCompradores().getOrDefault(id,null).setFecha_nacimiento(nacimiento);
             boolean masTiposEventos = true;
             while(masTiposEventos){
-                ArrayList<String> eventosSinSeleccionar = DispatcherPreferencias.getPreferencias();
+                ArrayList<String> eventosSinSeleccionar = preferencias.getPreferencias();
                 eventosSinSeleccionar.removeAll(Autenticador.getCompradores().getOrDefault(id, null).getPreferencias()); //otra vez habria que chequear que no sea null
                 if(eventosSinSeleccionar.size() != 0) {
                     print(" Seleccioná que tipo de eventos te interesan: ");
@@ -245,7 +250,8 @@ public class main {
                         i++;
                     }
                     String seleccion = s.nextLine(); //chequear que sea valido capaz es una opcion que ni sale!!!
-                    Autenticador.getCompradores().getOrDefault(id, null).getPreferencias().add(DispatcherPreferencias.getPreferencias().get(i - 1));
+                    Autenticador.getCompradores().getOrDefault(id, null).getPreferencias().add(preferencias.getPreferencias().get(Integer.parseInt(seleccion)-1));
+                    preferencias.getPreferencias().remove(seleccion);
                     print(" ¿Querés agregar más? [s/n]: ");
                     String opt = s.nextLine();
                     if (opt.equals("n")) {
@@ -264,7 +270,7 @@ public class main {
                     printEventoLogueado(e, entry.getKey());
     
                 }
-                print(" Ingresá el número de evento para expandirlo o [R]egrese al menú previo:");
+                print(" Ingresá el número de evento para expandirlo:");
                 String numstr = s.nextLine();
                 Integer num = Integer.parseInt(numstr);
                 if (eventos.get(num) != null){
