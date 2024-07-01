@@ -25,7 +25,8 @@ public class Envio {
         this.direccion = direccion;
     }
 
-    public double costoEnvio() {
+    public int costoEnvio() {
+        /*
         if (!retiraPorSucursal) { // Si es a domicilio
             Scanner scanner = new Scanner(System.in);
             System.out.print("Ingrese el número de código postal: ");
@@ -40,5 +41,8 @@ public class Envio {
             // Si es retiro por sucursal, no se cobra envío
             return 0.0;
         }
+        */
+        if(retiraPorSucursal){return 0;}
+        return 1200 + (int)Math.random()*5000;
     }
 }

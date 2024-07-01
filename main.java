@@ -1,3 +1,5 @@
+import com.sun.jdi.IntegerValue;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +63,8 @@ public class main {
             envio = s.nextLine();
             if (!reserva_caducada) {
                 manejarCompraExitosa(e, fecha, butacas, false, envio, idUsuario);
-                print(" Costo de envio $$$ se cobrará cuando llegue el paquete."); //ver como calcular esto, dice que se usa un sistema del correo en el enunciado (?? supongo se podrá inventar cualq numero para la demo
+                Envio env = new Envio(false,envio);
+                print(" Costo de envio $$$ "+ env.costoEnvio() +" se cobrará cuando llegue el paquete."); //ver como calcular esto, dice que se usa un sistema del correo en el enunciado (?? supongo se podrá inventar cualq numero para la demo
                 t.cancel();
             } else 
                 manejarReservaExpirada(e, fecha, butacas);
